@@ -1,9 +1,9 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
 import en from "../messages/en.json";
 import ru from "../messages/ru.json";
 
-const heading = (page: import("@playwright/test").Page) => page.getByRole("heading", { level: 1 });
+const heading = (page: Page) => page.getByRole("heading", { level: 1 });
 
 test.describe("home page, English browser", () => {
   test.use({ locale: "en-US" });
