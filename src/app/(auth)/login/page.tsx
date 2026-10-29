@@ -16,9 +16,9 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string; error?: string }>;
+  searchParams: Promise<{ next?: string; error?: string; notice?: string }>;
 }) {
-  const { next, error } = await searchParams;
+  const { next, error, notice } = await searchParams;
   const t = await getTranslations("Auth");
 
   return (
@@ -29,6 +29,11 @@ export default async function LoginPage({
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         {error === "link" && <Alert variant="destructive">{t("errors.linkInvalid")}</Alert>}
+        {notice === "other-browser" && (
+          <Alert variant="success" data-testid="auth-notice">
+            {t("otherBrowser")}
+          </Alert>
+        )}
         <LoginForm next={safeNextPath(next)} />
       </CardContent>
       <CardFooter className="justify-center text-sm text-muted-foreground">

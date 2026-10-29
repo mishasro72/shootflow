@@ -49,14 +49,15 @@
       "rateLimited": "Too many attempts. Wait a minute and try again.",
       "linkInvalid": "This link has expired or was already used. Request a new one.",
       "unexpected": "Something went wrong. Please try again."
-    }
+    },
+    "otherBrowser": "The link opened in a different browser from the one you used. If you were signing up, your email is already confirmed — just sign in here."
   },
   "Dashboard": {
     "title": "Projects",
     "greeting": "Hello, {name}!",
     "signOut": "Sign out",
     "emptyTitle": "No projects yet",
-    "emptyLead": "Your shoots will appear here. Creating projects arrives in the next step.",
+    "emptyLead": "Your shoots will appear here. Creating projects is coming in an upcoming update.",
     "shootDate": "Shoot date",
     "location": "Location",
     "noDate": "No date yet"

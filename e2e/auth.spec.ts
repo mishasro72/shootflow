@@ -102,6 +102,25 @@ test("magic link signs in and creates a studio for a new address", async ({ page
   await expect(page.getByTestId("projects-empty")).toBeVisible();
 });
 
+test("a link opened in another browser asks to sign in instead of failing", async ({ page, browser }) => {
+  const email = uniqueEmail("otherbrowser");
+
+  await page.goto("/login");
+  await page.getByRole("tab", { name: en.Auth.methodMagicLink }).click();
+  await page.getByLabel(en.Auth.email).fill(email);
+  await page.getByRole("button", { name: en.Auth.sendMagicLink }).click();
+  await expect(page.getByTestId("auth-sent")).toBeVisible();
+  const link = await waitForLink(email);
+
+  // A fresh context has none of the cookies from the browser that asked for the link.
+  const other = await browser.newContext({ locale: "en-US" });
+  const otherPage = await other.newPage();
+  await otherPage.goto(link);
+  await expect(otherPage).toHaveURL(/\/login\?notice=other-browser/);
+  await expect(otherPage.getByTestId("auth-notice")).toHaveText(en.Auth.otherBrowser);
+  await other.close();
+});
+
 test("signed-in photographers skip the login screen", async ({ page }) => {
   await signUp(page, "Skip Login", uniqueEmail("skip"));
   await page.goto("/login");
