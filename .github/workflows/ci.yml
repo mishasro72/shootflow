@@ -17,14 +17,17 @@ jobs:
     name: Lint, types, tests, build, e2e
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    permissions:
+      # Needed only to commit a freshly generated pnpm-lock.yaml back to main.
+      contents: write
     env:
       NEXT_TELEMETRY_DISABLED: "1"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: pnpm/action-setup@v4
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
 
@@ -32,41 +35,43 @@ jobs:
         id: install
         run: |
           if [ -f pnpm-lock.yaml ]; then
-            pnpm install --frozen-lockfile
+            scripts/ci-run.sh "Install" pnpm install --frozen-lockfile
             echo "generated=false" >> "$GITHUB_OUTPUT"
           else
             echo "::warning::pnpm-lock.yaml is missing; resolving dependencies fresh."
-            pnpm install --no-frozen-lockfile
+            scripts/ci-run.sh "Install" pnpm install --no-frozen-lockfile
             echo "generated=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Upload generated lockfile
-        if: steps.install.outputs.generated == 'true'
-        uses: actions/upload-artifact@v4
-        with:
-          name: pnpm-lock
-          path: pnpm-lock.yaml
+      - name: Commit generated lockfile
+        if: steps.install.outputs.generated == 'true' && github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add pnpm-lock.yaml
+          git commit -m "chore: add generated pnpm-lock.yaml"
+          git push
 
       - name: Lint
-        run: pnpm lint
+        run: scripts/ci-run.sh "Lint" pnpm lint
 
       - name: Typecheck
-        run: pnpm typecheck
+        run: scripts/ci-run.sh "Typecheck" pnpm typecheck
 
       - name: Translation keys
-        run: pnpm i18n:check
+        run: scripts/ci-run.sh "Translation keys" pnpm i18n:check
 
       - name: Unit tests
-        run: pnpm test
+        run: scripts/ci-run.sh "Unit tests" pnpm test
 
       - name: Build
-        run: pnpm build
+        run: scripts/ci-run.sh "Build" pnpm build
 
       - name: Install Playwright browser
-        run: pnpm exec playwright install --with-deps chromium
+        run: scripts/ci-run.sh "Playwright install" pnpm exec playwright install --with-deps chromium
 
       - name: End-to-end tests
-        run: pnpm test:e2e
+        run: scripts/ci-run.sh "E2E" pnpm test:e2e
 
       - name: Upload Playwright report
         if: failure()
@@ -75,3 +80,4 @@ jobs:
           name: playwright-report
           path: playwright-report
           retention-days: 7
+          if-no-files-found: ignore

@@ -5,8 +5,6 @@ import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const dir = fileURLToPath(new URL("../messages/", import.meta.url));
-
 /** Flattens {"A": {"b": "x"}} into ["A.b"], reporting empty values. */
 export function flattenKeys(value, prefix = "", empty = []) {
   const keys = [];
@@ -36,6 +34,7 @@ export function compareLocales(byLocale) {
 }
 
 function main() {
+  const dir = fileURLToPath(new URL("../messages/", import.meta.url));
   const files = readdirSync(dir).filter((name) => name.endsWith(".json"));
   const byLocale = {};
   for (const file of files) {
@@ -53,6 +52,6 @@ function main() {
   console.log(`i18n OK: ${files.length} locales, ${count} keys each.`);
 }
 
-if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
+if (import.meta.url.startsWith("file:") && process.argv[1] === fileURLToPath(import.meta.url)) {
   main();
 }
