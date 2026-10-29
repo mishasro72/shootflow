@@ -51,6 +51,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add pnpm-lock.yaml
           git commit -m "chore: add generated pnpm-lock.yaml"
+          git pull --rebase origin main
           git push
 
       - name: Lint
@@ -82,3 +83,57 @@ jobs:
           path: playwright-report
           retention-days: 7
           if-no-files-found: ignore
+
+  database:
+    name: Database migrations, RLS and pgTAP
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      # Needed only to commit regenerated database types back to main.
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Start local Supabase (applies migrations and seed)
+        run: scripts/ci-run.sh "Supabase start" supabase start -x studio,imgproxy,logflare,vector,edge-runtime,supavisor
+
+      - name: Lint database functions
+        run: scripts/ci-run.sh "Database lint" supabase db lint --level warning --fail-on error
+
+      - name: pgTAP tests
+        run: scripts/ci-run.sh "pgTAP" supabase test db
+
+      - name: Generate TypeScript types
+        run: |
+          mkdir -p src/lib/supabase
+          scripts/ci-run.sh "Generate types" bash -c 'supabase gen types typescript --local > src/lib/supabase/database.types.ts'
+
+      - name: Commit regenerated types
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          if [ -n "$(git status --porcelain src/lib/supabase/database.types.ts)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add src/lib/supabase/database.types.ts
+            git commit -m "chore: regenerate Supabase database types"
+            git pull --rebase origin main
+            git push
+          else
+            echo "Database types are up to date."
+          fi
+
+      - name: Check types are committed
+        if: github.event_name == 'pull_request'
+        run: |
+          if [ -n "$(git status --porcelain src/lib/supabase/database.types.ts)" ]; then
+            echo "::error title=Database types::src/lib/supabase/database.types.ts is out of date. Regenerate with: supabase gen types typescript --local"
+            exit 1
+          fi
+
+      - name: Stop Supabase
+        if: always()
+        run: supabase stop --no-backup

@@ -22,5 +22,6 @@ export default defineConfig([
     "playwright-report/**",
     "test-results/**",
     "next-env.d.ts",
+    "src/lib/supabase/database.types.ts",
   ]),
 ]);
