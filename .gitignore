@@ -1,0 +1,35 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# next.js
+.next/
+out/
+next-env.d.ts
+
+# production
+build/
+
+# testing
+coverage/
+playwright-report/
+test-results/
+blob-report/
+
+# env files (keep the example)
+.env*
+!.env.example
+
+# misc
+.DS_Store
+*.pem
+*.tsbuildinfo
+npm-debug.log*
+pnpm-debug.log*
+
+# vercel
+.vercel
+
+# supabase local
+supabase/.temp/
+supabase/.branches/

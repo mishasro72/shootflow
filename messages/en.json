@@ -1,0 +1,19 @@
+{
+  "Metadata": {
+    "title": "ShootFlow",
+    "description": "Shoot planning, shot list, proofing and delivery in one place."
+  },
+  "Home": {
+    "eyebrow": "For portrait photographers",
+    "title": "Every shoot, from moodboard to final gallery",
+    "lead": "Agree on looks with your model through one link, run the shot list on set, and deliver the finals without the back-and-forth.",
+    "status": "In development: step 1 of 13"
+  },
+  "Common": {
+    "language": "Language",
+    "theme": "Theme",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "themeSystem": "System"
+  }
+}
