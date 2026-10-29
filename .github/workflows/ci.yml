@@ -30,6 +30,8 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: 22
+          # Automatic pnpm caching needs pnpm-lock.yaml; turned on once the lockfile is committed.
+          package-manager-cache: false
 
       - name: Install dependencies
         id: install
