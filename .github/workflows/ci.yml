@@ -92,6 +92,18 @@ jobs:
       - name: End-to-end tests
         run: scripts/ci-run.sh "E2E" pnpm test:e2e
 
+      - name: End-to-end summary
+        if: always()
+        run: |
+          if [ -f test-results/results.json ]; then
+            node -e '
+              const r = require("./test-results/results.json");
+              const s = r.stats;
+              const files = [...new Set(r.suites.map((x) => x.file))].join(", ");
+              console.log(`::notice title=E2E summary::${s.expected} passed, ${s.unexpected} failed, ${s.flaky} flaky, ${s.skipped} skipped in ${files}`);
+            '
+          fi
+
       - name: Upload Playwright report
         if: failure()
         uses: actions/upload-artifact@v4
