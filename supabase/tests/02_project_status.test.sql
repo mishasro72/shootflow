@@ -4,7 +4,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set search_path = public, extensions;
 
-select plan(28);
+select plan(29);
 
 -- Fixtures ---------------------------------------------------------------------
 
@@ -27,9 +27,11 @@ insert into public.concept_items (id, project_id, workspace_id, category, title,
   ('c0000000-0000-0000-0000-000000000005', 'a0000000-0000-0000-0000-000000000001', '0000000a-0000-0000-0000-000000000000', 'MOODBOARD', 'Private note',   'APPROVED',          3, false),
   ('c0000000-0000-0000-0000-000000000006', 'a0000000-0000-0000-0000-000000000001', '0000000a-0000-0000-0000-000000000000', 'EQUIPMENT', '85mm lens',      'APPROVED',          1, false);
 
--- The photographer's own shot that is not tied to a card.
-insert into public.shot_list_items (project_id, workspace_id, title, sort_order)
-values ('a0000000-0000-0000-0000-000000000001', '0000000a-0000-0000-0000-000000000000', 'Hands close-up', 99);
+-- The photographer's own shot that is not tied to a card, and one already added
+-- from a card by hand before the shoot day.
+insert into public.shot_list_items (project_id, workspace_id, concept_item_id, title, sort_order) values
+  ('a0000000-0000-0000-0000-000000000001', '0000000a-0000-0000-0000-000000000000', null, 'Hands close-up', 99),
+  ('a0000000-0000-0000-0000-000000000001', '0000000a-0000-0000-0000-000000000000', 'c0000000-0000-0000-0000-000000000001', 'Window light, my framing', 0);
 
 -- Act as the photographer -------------------------------------------------------
 
@@ -69,6 +71,12 @@ select set_eq(
   $$ select concept_item_id from public.shot_list_items where project_id = 'a0000000-0000-0000-0000-000000000001' and concept_item_id is not null $$,
   $$ values ('c0000000-0000-0000-0000-000000000001'::uuid), ('c0000000-0000-0000-0000-000000000002'::uuid), ('c0000000-0000-0000-0000-000000000004'::uuid) $$,
   'day-of references are the approved and unanswered moodboard/wardrobe cards only'
+);
+
+select is(
+  (select title from public.shot_list_items where concept_item_id = 'c0000000-0000-0000-0000-000000000001'),
+  'Window light, my framing',
+  'a card already in the shot list is not duplicated or overwritten'
 );
 
 select ok(
