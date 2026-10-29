@@ -13,7 +13,7 @@ insert into auth.users (
   'demo@shootflow.test',
   extensions.crypt('shootflow-demo', extensions.gen_salt('bf')),
   now(),
-  '{"provider":"email","providers":["email"]}',
+  '{"provider":"email","providers":["email"],"provision":false}',
   '{"name":"Demo Photographer"}',
   now(), now(), '', '', '', ''
 );

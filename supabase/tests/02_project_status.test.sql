@@ -8,7 +8,8 @@ select plan(29);
 
 -- Fixtures ---------------------------------------------------------------------
 
-insert into auth.users (id, email) values ('00000000-0000-0000-0000-0000000000a1', 'a@example.test');
+-- provision=false: these fixtures create their own workspaces with fixed ids.
+insert into auth.users (id, email, raw_app_meta_data) values ('00000000-0000-0000-0000-0000000000a1', 'a@example.test', '{"provision":false}');
 insert into public.profiles (id, name) values ('00000000-0000-0000-0000-0000000000a1', 'Photographer A');
 insert into public.workspaces (id, name, plan_id)
 select '0000000a-0000-0000-0000-000000000000', 'Studio A', id from public.plans where code = 'free';

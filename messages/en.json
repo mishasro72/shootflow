@@ -7,7 +7,9 @@
     "eyebrow": "For portrait photographers",
     "title": "Every shoot, from moodboard to final gallery",
     "lead": "Agree on looks with your model through one link, run the shot list on set, and deliver the finals without the back-and-forth.",
-    "status": "In development: step 1 of 13"
+    "status": "In development: step 3 of 13",
+    "signIn": "Sign in",
+    "getStarted": "Create account"
   },
   "Common": {
     "language": "Language",
@@ -15,5 +17,58 @@
     "themeLight": "Light",
     "themeDark": "Dark",
     "themeSystem": "System"
+  },
+  "Auth": {
+    "signInTitle": "Sign in",
+    "signInLead": "Sign in to open your projects.",
+    "signUpTitle": "Create account",
+    "signUpLead": "A photographer account. Models and clients open their link without signing up.",
+    "signInMethod": "Sign-in method",
+    "methodPassword": "Password",
+    "methodMagicLink": "Email link",
+    "email": "Email",
+    "password": "Password",
+    "name": "Your name or studio name",
+    "nameHint": "This is what your clients will see. You can change it later.",
+    "passwordHint": "At least 8 characters.",
+    "magicLinkHint": "We'll email you a sign-in link. If you don't have an account yet, one will be created.",
+    "signIn": "Sign in",
+    "sendMagicLink": "Send link",
+    "createAccount": "Create account",
+    "noAccount": "No account yet?",
+    "signUpLink": "Sign up",
+    "haveAccount": "Already have an account?",
+    "signInLink": "Sign in",
+    "checkEmail": "We sent an email to {email}. Open the link in it on this device.",
+    "errors": {
+      "invalidInput": "Check your email and password.",
+      "invalidCredentials": "Wrong email or password.",
+      "emailNotConfirmed": "Confirm your email with the link we sent first.",
+      "userExists": "An account with this email already exists. Sign in or use an email link.",
+      "weakPassword": "That password is too simple: use at least 8 characters.",
+      "rateLimited": "Too many attempts. Wait a minute and try again.",
+      "linkInvalid": "This link has expired or was already used. Request a new one.",
+      "unexpected": "Something went wrong. Please try again."
+    }
+  },
+  "Dashboard": {
+    "title": "Projects",
+    "greeting": "Hello, {name}!",
+    "signOut": "Sign out",
+    "emptyTitle": "No projects yet",
+    "emptyLead": "Your shoots will appear here. Creating projects arrives in the next step.",
+    "shootDate": "Shoot date",
+    "location": "Location",
+    "noDate": "No date yet"
+  },
+  "ProjectStatus": {
+    "DRAFT": "Draft",
+    "PLANNING": "Planning",
+    "SHOOT_DAY": "Shoot day",
+    "PROOFING": "Proofing",
+    "SELECTION_SUBMITTED": "Selection submitted",
+    "RETOUCHING": "Retouching",
+    "DELIVERED": "Delivered",
+    "COMPLETED": "Completed"
   }
 }
