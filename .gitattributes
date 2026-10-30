@@ -1,0 +1,11 @@
+# Store every text file with LF line endings, whatever the editor's OS.
+# Without this, Windows checkouts can turn files into CRLF and make diffs noisy.
+* text=auto eol=lf
+
+# Binary files are never touched.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ico binary
+*.woff2 binary

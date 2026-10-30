@@ -17,7 +17,8 @@ export default defineConfig({
   },
   projects: [
     { name: "desktop", use: { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 900 } } },
-    { name: "mobile", use: { ...devices["Pixel 7"] } },
+    // 375 px is the narrowest common phone width (iPhone SE / mini), the plan's mobile target.
+    { name: "mobile", use: { ...devices["Pixel 7"], viewport: { width: 375, height: 812 } } },
   ],
   webServer: process.env.PLAYWRIGHT_BASE_URL
     ? undefined

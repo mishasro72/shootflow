@@ -2,7 +2,8 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    # claude/** branches let the mentor check a change in CI before handing it over.
+    branches: [main, "claude/**"]
   pull_request:
 
 concurrency:
