@@ -7,7 +7,7 @@
     "eyebrow": "For portrait photographers",
     "title": "Every shoot, from moodboard to final gallery",
     "lead": "Agree on looks with your model through one link, run the shot list on set, and deliver the finals without the back-and-forth.",
-    "status": "In development: step 3 of 13",
+    "status": "In development: step 4 of 13",
     "signIn": "Sign in",
     "getStarted": "Create account"
   },
@@ -71,5 +71,28 @@
     "RETOUCHING": "Retouching",
     "DELIVERED": "Delivered",
     "COMPLETED": "Completed"
+  },
+  "Nav": {
+    "main": "Main menu",
+    "projects": "Projects",
+    "settings": "Settings"
+  },
+  "Settings": {
+    "title": "Settings",
+    "lead": "Profile, studio and notifications.",
+    "appearanceTitle": "Appearance",
+    "appearanceLead": "Theme and interface language. The language is saved to your profile and follows you across devices.",
+    "comingSoon": "Profile, studio, watermark and Telegram settings arrive in the next steps."
+  },
+  "Portal": {
+    "title": "Your shoot",
+    "lead": "Your photographer shares everything you need for the shoot here.",
+    "shootTitle": "Date and place",
+    "shootLead": "When and where we shoot, with an “Add to calendar” button.",
+    "conceptTitle": "Looks and references",
+    "conceptLead": "Moodboard and wardrobe: approve them or ask for a change.",
+    "galleryTitle": "Photos",
+    "galleryLead": "Pick your favourites for retouching, then get the final gallery.",
+    "comingSoon": "The portal is in development: details of your shoot will appear here soon."
   }
 }
