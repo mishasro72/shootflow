@@ -14,7 +14,7 @@ const LOCALES = [
 const THEMES = ["light", "dark"] as const;
 
 const PUBLIC_PAGES = ["/", "/login", "/signup", "/p/example-token"];
-const DASHBOARD_PAGES = ["/dashboard", "/dashboard/settings"];
+const DASHBOARD_PAGES = ["/dashboard", "/dashboard/projects/new", "/dashboard/settings"];
 
 for (const { browserLocale, lang, t } of LOCALES) {
   for (const theme of THEMES) {
@@ -53,7 +53,7 @@ for (const { browserLocale, lang, t } of LOCALES) {
             else expect(box.y + box.height, "tab bar sits at the bottom").toBeGreaterThan(viewport.height - 4);
           }
 
-          const current = path === "/dashboard" ? t.Nav.projects : t.Nav.settings;
+          const current = path.startsWith("/dashboard/settings") ? t.Nav.settings : t.Nav.projects;
           await expect(nav.getByRole("link", { name: current })).toHaveAttribute("aria-current", "page");
         }
       });

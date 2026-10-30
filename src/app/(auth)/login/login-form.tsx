@@ -3,13 +3,13 @@
 import { useTranslations } from "next-intl";
 import { useActionState, useState } from "react";
 
+import { SubmitButton } from "@/components/submit-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 
 import { sendMagicLink, signInWithPassword, type AuthFormState } from "../actions";
 import { FormMessage } from "../form-message";
-import { SubmitButton } from "../submit-button";
 
 const initial: AuthFormState = { status: "idle" };
 

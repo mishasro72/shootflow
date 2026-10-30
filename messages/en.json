@@ -7,7 +7,7 @@
     "eyebrow": "For portrait photographers",
     "title": "Every shoot, from moodboard to final gallery",
     "lead": "Agree on looks with your model through one link, run the shot list on set, and deliver the finals without the back-and-forth.",
-    "status": "In development: step 4 of 13",
+    "status": "In development: step 5 of 13",
     "signIn": "Sign in",
     "getStarted": "Create account"
   },
@@ -16,7 +16,8 @@
     "theme": "Theme",
     "themeLight": "Light",
     "themeDark": "Dark",
-    "themeSystem": "System"
+    "themeSystem": "System",
+    "copied": "Copied"
   },
   "Auth": {
     "signInTitle": "Sign in",
@@ -57,10 +58,12 @@
     "greeting": "Hello, {name}!",
     "signOut": "Sign out",
     "emptyTitle": "No projects yet",
-    "emptyLead": "Your shoots will appear here. Creating projects is coming in an upcoming update.",
+    "emptyLead": "Create a project for each shoot: date, place, client and everything to agree on.",
     "shootDate": "Shoot date",
     "location": "Location",
-    "noDate": "No date yet"
+    "noDate": "No date yet",
+    "newProject": "New project",
+    "createFirst": "Create your first project"
   },
   "ProjectStatus": {
     "DRAFT": "Draft",
@@ -94,5 +97,65 @@
     "galleryTitle": "Photos",
     "galleryLead": "Pick your favourites for retouching, then get the final gallery.",
     "comingSoon": "The portal is in development: details of your shoot will appear here soon."
+  },
+  "ProjectForm": {
+    "newTitle": "New project",
+    "editTitle": "Edit project",
+    "create": "Create project",
+    "save": "Save",
+    "cancel": "Cancel",
+    "sectionShoot": "Shoot",
+    "sectionLocation": "Place",
+    "sectionClient": "Client",
+    "sectionNotes": "Notes",
+    "title": "Title",
+    "titlePlaceholder": "For example, “Golden hour portraits”",
+    "shootDate": "Date",
+    "startTime": "Start",
+    "endTime": "End",
+    "timezone": "Time zone",
+    "timezoneHint": "Shoot times are in the location's local time.",
+    "locationName": "Place name",
+    "locationNamePlaceholder": "Studio, park, café",
+    "locationAddress": "Address",
+    "clientName": "Client name",
+    "clientEmail": "Client email",
+    "clientLocale": "Client language",
+    "clientLocaleHint": "Your client sees their page and notifications in this language.",
+    "retouchLimit": "Photos to retouch",
+    "retouchLimitHint": "How many photos the client can pick.",
+    "notes": "Notes",
+    "notesPlaceholder": "Only you can see these",
+    "errors": {
+      "required": "Please fill this in.",
+      "tooLong": "Too long.",
+      "invalid": "Please check this value.",
+      "endBeforeStart": "The end must be after the start.",
+      "outOfRange": "Use a number from 0 to 500."
+    },
+    "formErrors": {
+      "quota": "You have reached the active project limit on your plan. Archive finished projects first.",
+      "unexpected": "Could not save. Please try again."
+    }
+  },
+  "Project": {
+    "back": "All projects",
+    "edit": "Edit",
+    "archive": "Archive",
+    "archiveConfirm": "Archive this project?",
+    "archiveYes": "Yes, archive",
+    "archiveNo": "No",
+    "when": "When",
+    "noDate": "No date yet",
+    "where": "Where",
+    "noLocation": "No place yet",
+    "client": "Client",
+    "noClient": "No client yet",
+    "clientDetails": "Language: {language} · Photos to retouch: {limit}",
+    "notes": "Notes",
+    "noNotes": "No notes",
+    "clientLink": "Client link",
+    "clientLinkLead": "Send this to your client: it opens their shoot page without signing up. The client page is still in development.",
+    "copyLink": "Copy"
   }
 }
