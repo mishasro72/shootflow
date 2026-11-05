@@ -50,7 +50,7 @@ double_confirm_changes = true
 enable_confirmations = false
 max_frequency = "1s"
 
-[inbucket]
+[local_smtp]
 # Local mail catcher (Mailpit); e2e tests read magic links from it.
 enabled = true
 port = 54324
