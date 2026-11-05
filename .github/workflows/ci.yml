@@ -72,7 +72,7 @@ jobs:
 
       - uses: supabase/setup-cli@v1
         with:
-          version: latest
+          version: 3.0.0
 
       - name: Start local Supabase for the app
         run: |
@@ -130,7 +130,7 @@ jobs:
 
       - uses: supabase/setup-cli@v1
         with:
-          version: latest
+          version: 3.0.0
 
       - name: Start local Supabase (applies migrations and seed)
         run: scripts/ci-run.sh "Supabase start" supabase start -x studio,imgproxy,logflare,vector,edge-runtime,supavisor
@@ -191,7 +191,7 @@ jobs:
 
       - uses: supabase/setup-cli@v1
         with:
-          version: latest
+          version: 3.0.0
 
       - name: Push migrations
         run: |
