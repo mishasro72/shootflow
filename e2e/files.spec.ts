@@ -71,8 +71,9 @@ test("files go straight to storage, show up, download and delete; storage use fo
   await expect(rows).toContainText("brief.pdf");
   expect(await storageUsed(page)).toBe(PDF.length);
 
-  // The deleted object is gone from storage too.
-  expect((await request.get(href ?? "")).status()).toBe(404);
+  // The deleted object is gone from storage too. A missing key is 404 on R2; S3-style
+  // servers answer 403 when the signer may not list the bucket. Either way: not 200.
+  expect([403, 404]).toContain((await request.get(href ?? "")).status());
 });
 
 test("a file of a type we do not accept is refused before anything is sent", async ({ page }) => {
