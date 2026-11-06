@@ -96,7 +96,7 @@ jobs:
       - name: Start S3 storage for uploads (MinIO stands in for R2)
         run: |
           scripts/ci-run.sh "MinIO start" docker run -d --name minio -p 9000:9000 \
-            -e MINIO_ROOT_USER=shootflow -e MINIO_ROOT_PASSWORD=shootflow-secret minio/minio server /data
+            -e MINIO_ROOT_USER=shootflow -e MINIO_ROOT_PASSWORD=shootflow-secret quay.io/minio/minio:RELEASE.2025-04-22T22-12-26Z server /data
           for i in $(seq 1 30); do curl -sf http://localhost:9000/minio/health/live && break; sleep 1; done
           scripts/ci-run.sh "MinIO bucket" curl -sf -X PUT --aws-sigv4 "aws:amz:us-east-1:s3" \
             --user shootflow:shootflow-secret http://localhost:9000/shootflow-e2e
