@@ -93,12 +93,14 @@ jobs:
             echo "SUPABASE_SECRET_KEY=${SECRET_KEY:-$SERVICE_ROLE_KEY}"
           } >> "$GITHUB_ENV"
 
-      - name: Start S3 storage for uploads (MinIO stands in for R2)
+      - name: Start S3 storage for uploads (moto stands in for R2)
         run: |
-          scripts/ci-run.sh "MinIO start" docker run -d --name minio -p 9000:9000 \
-            -e MINIO_ROOT_USER=shootflow -e MINIO_ROOT_PASSWORD=shootflow-secret quay.io/minio/minio:RELEASE.2025-04-22T22-12-26Z server /data
-          for i in $(seq 1 30); do curl -sf http://localhost:9000/minio/health/live && break; sleep 1; done
-          scripts/ci-run.sh "MinIO bucket" curl -sf -X PUT --aws-sigv4 "aws:amz:us-east-1:s3" \
+          # moto is an S3 emulator from PyPI: presigned URLs, HEAD/GET/PUT/DELETE and CORS,
+          # with no Docker image to pull. It does not check signatures; R2 does.
+          scripts/ci-run.sh "S3 emulator install" pipx install "moto[server]==5.1.4"
+          nohup moto_server -H 127.0.0.1 -p 9000 > "$RUNNER_TEMP/moto.log" 2>&1 &
+          for i in $(seq 1 30); do curl -sf http://localhost:9000/moto-api/ > /dev/null && break; sleep 1; done
+          scripts/ci-run.sh "S3 bucket" curl -sf -X PUT --aws-sigv4 "aws:amz:us-east-1:s3" \
             --user shootflow:shootflow-secret http://localhost:9000/shootflow-e2e
           {
             echo "R2_ACCOUNT_ID=ci"
