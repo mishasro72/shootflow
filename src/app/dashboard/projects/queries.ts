@@ -20,7 +20,7 @@ export const getProject = cache(async (id: string) => {
       `id, title, status, shoot_start, shoot_end, timezone,
        location_name, location_address, location_map_url,
        google_place_id, location_lat, location_lng, place_synced_at,
-       notes, retouch_limit, client_locale, access_token, archived_at,
+       notes, retouch_limit, client_locale, access_token, pin_hash, archived_at,
        client:project_clients (name, email)`,
     )
     .eq("id", id)

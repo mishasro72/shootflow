@@ -1,10 +1,12 @@
 import {
   ArrowLeft,
   CalendarDays,
+  CalendarPlus,
   ExternalLink,
   Link2,
   MapPin,
   Pencil,
+  RefreshCw,
   StickyNote,
   Sun,
   User,
@@ -19,6 +21,7 @@ import type { ReactNode } from "react";
 import { CopyButton } from "@/components/copy-button";
 import { SubmitButton } from "@/components/submit-button";
 import { Button } from "@/components/ui/button";
+import { ConfirmButton } from "@/components/confirm-button";
 import { getEnv } from "@/lib/env";
 import { getDayLight, goldenHourAdvice, type TimeRange } from "@/lib/sun/light";
 import { formatShootDate, formatShootTime, formatTimeZone } from "@/lib/time/format";
@@ -26,9 +29,11 @@ import { utcToZonedLocal } from "@/lib/time/zoned";
 
 import { archiveProject, shiftToGoldenHour } from "../actions";
 import { getFreshCoords } from "../place-coords";
+import { clearPortalPin, rotatePortalLink, setPortalPin } from "../portal-actions";
 import { getProject } from "../queries";
 
 import { ArchiveButton } from "./archive-button";
+import { PinForm } from "./pin-form";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -48,7 +53,10 @@ export default async function ProjectPage({ params }: Props) {
     getTranslations("ProjectStatus"),
     getLocale(),
   ]);
-  const portalUrl = new URL(`/p/${project.access_token}`, getEnv().NEXT_PUBLIC_APP_URL).toString();
+  const env = getEnv();
+  const portalUrl = new URL(`/p/${project.access_token}`, env.NEXT_PUBLIC_APP_URL).toString();
+  // New links and PINs are written with the Supabase secret key; without it they are hidden.
+  const secretsEnabled = Boolean(env.SUPABASE_SECRET_KEY);
 
   // Light for the shoot day: needs a date and coordinates we may use (see getFreshCoords).
   const coords = project.shoot_start ? await getFreshCoords(project) : null;
@@ -114,6 +122,14 @@ export default async function ProjectPage({ params }: Props) {
               </p>
               <p>{formatShootTime(project.shoot_start, project.shoot_end, project.timezone, locale)}</p>
               <p className="text-xs text-muted-foreground">{formatTimeZone(project.timezone)}</p>
+              <a
+                href={`/api/projects/${project.id}/calendar.ics`}
+                download
+                className="mt-1 inline-flex w-fit items-center gap-1 underline-offset-4 hover:underline"
+              >
+                <CalendarPlus className="size-3.5" aria-hidden />
+                {t("addToCalendar")}
+              </a>
             </>
           ) : (
             <p className="text-muted-foreground">{t("noDate")}</p>
@@ -202,6 +218,26 @@ export default async function ProjectPage({ params }: Props) {
           </code>
           <CopyButton value={portalUrl} label={t("copyLink")} />
         </div>
+        {secretsEnabled ? (
+          <div className="mt-3 flex flex-col gap-4 border-t pt-3">
+            <ConfirmButton
+              action={rotatePortalLink.bind(null, project.id)}
+              label={t("rotateLink")}
+              question={t("rotateConfirm")}
+              yes={t("rotateYes")}
+              no={t("rotateNo")}
+              icon={<RefreshCw aria-hidden />}
+              testId="rotate-link"
+            />
+            <PinForm
+              hasPin={project.pin_hash !== null}
+              action={setPortalPin.bind(null, project.id)}
+              clearAction={clearPortalPin.bind(null, project.id)}
+            />
+          </div>
+        ) : (
+          <p className="mt-3 text-xs text-muted-foreground">{t("secretsOff")}</p>
+        )}
       </InfoCard>
     </div>
   );

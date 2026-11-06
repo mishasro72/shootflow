@@ -5,16 +5,13 @@ import { z } from "zod";
 import { locales } from "@/i18n/config";
 import { getCurrentUser } from "@/lib/auth/session";
 import { getPlaceDetails, PlacesUnavailableError } from "@/lib/places/google";
-import { PLACE_ID_PATTERN } from "@/lib/places/policy";
+import { placeIdSchema, sessionTokenSchema } from "@/lib/places/schemas";
 import type { PickedPlace } from "@/lib/places/types";
 
 /** GET /api/places/details?id=<place id>&session=<uuid>&lang=en */
 const query = z.object({
-  id: z.string().regex(PLACE_ID_PATTERN),
-  session: z
-    .string()
-    .regex(/^[A-Za-z0-9_-]{1,36}$/)
-    .optional(),
+  id: placeIdSchema,
+  session: sessionTokenSchema,
   lang: z.enum(locales),
 });
 

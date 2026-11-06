@@ -9,9 +9,6 @@ export const PLACE_COORDS_MAX_AGE_DAYS = 30;
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-/** Place IDs are URL-safe text, e.g. "ChIJN1t_tDeuEmsRUsoyG83frY4". */
-export const PLACE_ID_PATTERN = /^[A-Za-z0-9_-]{1,300}$/;
-
 /** True while coordinates synced at `syncedAt` may still be used. */
 export function isCoordsFresh(syncedAt: string | null, now: Date = new Date()): boolean {
   if (!syncedAt) return false;

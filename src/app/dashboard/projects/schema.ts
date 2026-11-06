@@ -1,6 +1,7 @@
 import { z } from "zod";
 
-import { googleMapsUrl, PLACE_ID_PATTERN } from "@/lib/places/policy";
+import { googleMapsUrl } from "@/lib/places/policy";
+import { placeIdSchema } from "@/lib/places/schemas";
 import { isValidTimeZone, utcToZonedLocal, zonedLocalToUtc } from "@/lib/time/zoned";
 
 /**
@@ -76,7 +77,7 @@ const schema = z
     placeId: z
       .string()
       .trim()
-      .refine((value) => value === "" || PLACE_ID_PATTERN.test(value), "invalid"),
+      .refine((value) => value === "" || placeIdSchema.safeParse(value).success, "invalid"),
     placeLat: z.string().trim().refine(isCoordinate(90), "invalid"),
     placeLng: z.string().trim().refine(isCoordinate(180), "invalid"),
     notes: z.string().trim().max(4000, "tooLong"),

@@ -90,6 +90,7 @@ jobs:
             echo "NEXT_PUBLIC_APP_URL=http://localhost:3000"
             echo "NEXT_PUBLIC_SUPABASE_URL=${API_URL}"
             echo "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=${PUBLISHABLE_KEY:-$ANON_KEY}"
+            echo "SUPABASE_SECRET_KEY=${SECRET_KEY:-$SERVICE_ROLE_KEY}"
           } >> "$GITHUB_ENV"
 
       - name: Build
