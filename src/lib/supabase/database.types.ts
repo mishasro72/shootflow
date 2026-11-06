@@ -159,7 +159,7 @@ isOneToOne: false
                   }
                   ComputedFields: never
                   Insert: {
-                    "content_type": string,"created_at"?: string,"file_name": string,"id"?: string,"object_key": string,"project_id": string,"size_bytes": number,"status"?: Database["public"]['Enums']["media_status"],"uploaded_at"?: string | null,"workspace_id": string
+                    "content_type": string,"created_at"?: string,"file_name": string,"id"?: string,"object_key"?: string,"project_id": string,"size_bytes": number,"status"?: Database["public"]['Enums']["media_status"],"uploaded_at"?: string | null,"workspace_id": string
                   }
                   Update: {
                     "content_type"?: string,"created_at"?: string,"file_name"?: string,"id"?: string,"object_key"?: string,"project_id"?: string,"size_bytes"?: number,"status"?: Database["public"]['Enums']["media_status"],"uploaded_at"?: string | null,"workspace_id"?: string
