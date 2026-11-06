@@ -22,7 +22,7 @@ const schema = z.object({
   R2_ACCESS_KEY_ID: z.string().min(1).optional(),
   R2_SECRET_ACCESS_KEY: z.string().min(1).optional(),
   R2_BUCKET: z.string().min(1).optional(),
-  // Only for tests: another S3-compatible server (MinIO in CI) and its region.
+  // Only for tests: another S3-compatible server (an emulator in CI) and its region.
   R2_ENDPOINT: z.url().optional(),
   R2_REGION: z.string().min(1).default("auto"),
 });
