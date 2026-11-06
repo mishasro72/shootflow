@@ -34,6 +34,7 @@ import { getProject } from "../queries";
 
 import { ArchiveButton } from "./archive-button";
 import { PinForm } from "./pin-form";
+import { ProjectFiles } from "./project-files";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -209,6 +210,8 @@ export default async function ProjectPage({ params }: Props) {
           )}
         </InfoCard>
       )}
+
+      <ProjectFiles projectId={project.id} />
 
       <InfoCard icon={Link2} title={t("clientLink")}>
         <p className="text-muted-foreground">{t("clientLinkLead")}</p>

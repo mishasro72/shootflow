@@ -93,6 +93,22 @@ jobs:
             echo "SUPABASE_SECRET_KEY=${SECRET_KEY:-$SERVICE_ROLE_KEY}"
           } >> "$GITHUB_ENV"
 
+      - name: Start S3 storage for uploads (MinIO stands in for R2)
+        run: |
+          scripts/ci-run.sh "MinIO start" docker run -d --name minio -p 9000:9000 \
+            -e MINIO_ROOT_USER=shootflow -e MINIO_ROOT_PASSWORD=shootflow-secret minio/minio server /data
+          for i in $(seq 1 30); do curl -sf http://localhost:9000/minio/health/live && break; sleep 1; done
+          scripts/ci-run.sh "MinIO bucket" curl -sf -X PUT --aws-sigv4 "aws:amz:us-east-1:s3" \
+            --user shootflow:shootflow-secret http://localhost:9000/shootflow-e2e
+          {
+            echo "R2_ACCOUNT_ID=ci"
+            echo "R2_ACCESS_KEY_ID=shootflow"
+            echo "R2_SECRET_ACCESS_KEY=shootflow-secret"
+            echo "R2_BUCKET=shootflow-e2e"
+            echo "R2_ENDPOINT=http://localhost:9000"
+            echo "R2_REGION=us-east-1"
+          } >> "$GITHUB_ENV"
+
       - name: Build
         run: scripts/ci-run.sh "Build" pnpm build
 
@@ -132,7 +148,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
-      # Needed only to commit regenerated database types back to main.
+      # Needed only to commit regenerated database types back to the branch.
       contents: write
     steps:
       - uses: actions/checkout@v5
@@ -156,14 +172,15 @@ jobs:
           scripts/ci-run.sh "Generate types" bash -c 'supabase gen types typescript --local > src/lib/supabase/database.types.ts'
 
       - name: Commit regenerated types
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        # main, and the mentor's claude/** check branches (so new tables get their types).
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/claude/'))
         run: |
           if [ -n "$(git status --porcelain src/lib/supabase/database.types.ts)" ]; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add src/lib/supabase/database.types.ts
             git commit -m "chore: regenerate Supabase database types"
-            git pull --rebase origin main
+            git pull --rebase origin "${{ github.ref_name }}"
             git push
           else
             echo "Database types are up to date."

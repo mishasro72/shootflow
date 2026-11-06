@@ -17,6 +17,14 @@ const schema = z.object({
   // bypasses RLS, so only code that checked access first may use it: client portal and
   // calendar feed handlers, and the writes of portal secrets.
   SUPABASE_SECRET_KEY: z.string().min(1).optional(),
+  // Cloudflare R2 (S3-compatible) for photos and files. All four are needed to turn uploads on.
+  R2_ACCOUNT_ID: z.string().min(1).optional(),
+  R2_ACCESS_KEY_ID: z.string().min(1).optional(),
+  R2_SECRET_ACCESS_KEY: z.string().min(1).optional(),
+  R2_BUCKET: z.string().min(1).optional(),
+  // Only for tests: another S3-compatible server (MinIO in CI) and its region.
+  R2_ENDPOINT: z.url().optional(),
+  R2_REGION: z.string().min(1).default("auto"),
 });
 
 export type Env = z.infer<typeof schema>;
