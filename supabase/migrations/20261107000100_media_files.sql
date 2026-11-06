@@ -14,8 +14,9 @@ create table public.media_files (
   id uuid primary key default gen_random_uuid(),
   workspace_id uuid not null references public.workspaces (id) on delete cascade,
   project_id uuid not null references public.projects (id) on delete cascade,
-  -- Set by the database from the ids below, never by the caller (see the trigger).
-  object_key text not null unique,
+  -- Set by the database from the ids below, never by the caller (see the trigger). The
+  -- empty default only makes the column optional for inserts; the trigger always replaces it.
+  object_key text not null unique default '',
   file_name text not null check (char_length(file_name) between 1 and 255),
   content_type text not null check (content_type ~ '^(image/[a-z0-9.+-]+|application/pdf)$'),
   size_bytes bigint not null check (size_bytes > 0 and size_bytes <= 100 * 1024 * 1024),
