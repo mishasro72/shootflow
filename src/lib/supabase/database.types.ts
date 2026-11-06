@@ -153,6 +153,32 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"media_files": {
+                  Row: {
+                    "content_type": string,"created_at": string,"file_name": string,"id": string,"object_key": string,"project_id": string,"size_bytes": number,"status": Database["public"]['Enums']["media_status"],"uploaded_at": string | null,"workspace_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "content_type": string,"created_at"?: string,"file_name": string,"id"?: string,"object_key": string,"project_id": string,"size_bytes": number,"status"?: Database["public"]['Enums']["media_status"],"uploaded_at"?: string | null,"workspace_id": string
+                  }
+                  Update: {
+                    "content_type"?: string,"created_at"?: string,"file_name"?: string,"id"?: string,"object_key"?: string,"project_id"?: string,"size_bytes"?: number,"status"?: Database["public"]['Enums']["media_status"],"uploaded_at"?: string | null,"workspace_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "media_files_project_id_fkey"
+      columns: ["project_id"]
+isOneToOne: false
+      referencedRelation: "projects"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "media_files_workspace_id_fkey"
+      columns: ["workspace_id"]
+isOneToOne: false
+      referencedRelation: "workspaces"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"notification_endpoints": {
                   Row: {
                     "address": string,"channel": Database["public"]['Enums']["notification_channel"],"created_at": string,"id": string,"is_enabled": boolean,"project_client_id": string | null,"recipient_type": Database["public"]['Enums']["recipient_type"],"updated_at": string,"user_id": string | null,"verified_at": string | null,"workspace_id": string
@@ -441,7 +467,7 @@ isOneToOne: false
       } }
           }
           Enums: {
-            "actor_type": "PHOTOGRAPHER"|"CLIENT"|"SYSTEM","author_type": "PHOTOGRAPHER"|"CLIENT","concept_category": "MOODBOARD"|"WARDROBE"|"EQUIPMENT","concept_status": "PENDING"|"APPROVED"|"CHANGES_REQUESTED","notification_channel": "TELEGRAM"|"EMAIL","outbox_status": "PENDING"|"SENT"|"FAILED"|"SKIPPED","project_status": "DRAFT"|"PLANNING"|"SHOOT_DAY"|"PROOFING"|"SELECTION_SUBMITTED"|"RETOUCHING"|"DELIVERED"|"COMPLETED","recipient_type": "PHOTOGRAPHER"|"CLIENT","retouch_order_status": "PENDING"|"PAID"|"CANCELLED","selection_type": "INCLUDED"|"EXTRA","shot_status": "PENDING"|"SHOT"|"REJECTED","workspace_role": "OWNER"|"ASSISTANT"
+            "actor_type": "PHOTOGRAPHER"|"CLIENT"|"SYSTEM","author_type": "PHOTOGRAPHER"|"CLIENT","concept_category": "MOODBOARD"|"WARDROBE"|"EQUIPMENT","concept_status": "PENDING"|"APPROVED"|"CHANGES_REQUESTED","media_status": "PENDING"|"READY","notification_channel": "TELEGRAM"|"EMAIL","outbox_status": "PENDING"|"SENT"|"FAILED"|"SKIPPED","project_status": "DRAFT"|"PLANNING"|"SHOOT_DAY"|"PROOFING"|"SELECTION_SUBMITTED"|"RETOUCHING"|"DELIVERED"|"COMPLETED","recipient_type": "PHOTOGRAPHER"|"CLIENT","retouch_order_status": "PENDING"|"PAID"|"CANCELLED","selection_type": "INCLUDED"|"EXTRA","shot_status": "PENDING"|"SHOT"|"REJECTED","workspace_role": "OWNER"|"ASSISTANT"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -557,7 +583,7 @@ export type CompositeTypes<
 export const Constants = {
   "public": {
           Enums: {
-            "actor_type": ["PHOTOGRAPHER", "CLIENT", "SYSTEM"],"author_type": ["PHOTOGRAPHER", "CLIENT"],"concept_category": ["MOODBOARD", "WARDROBE", "EQUIPMENT"],"concept_status": ["PENDING", "APPROVED", "CHANGES_REQUESTED"],"notification_channel": ["TELEGRAM", "EMAIL"],"outbox_status": ["PENDING", "SENT", "FAILED", "SKIPPED"],"project_status": ["DRAFT", "PLANNING", "SHOOT_DAY", "PROOFING", "SELECTION_SUBMITTED", "RETOUCHING", "DELIVERED", "COMPLETED"],"recipient_type": ["PHOTOGRAPHER", "CLIENT"],"retouch_order_status": ["PENDING", "PAID", "CANCELLED"],"selection_type": ["INCLUDED", "EXTRA"],"shot_status": ["PENDING", "SHOT", "REJECTED"],"workspace_role": ["OWNER", "ASSISTANT"]
+            "actor_type": ["PHOTOGRAPHER", "CLIENT", "SYSTEM"],"author_type": ["PHOTOGRAPHER", "CLIENT"],"concept_category": ["MOODBOARD", "WARDROBE", "EQUIPMENT"],"concept_status": ["PENDING", "APPROVED", "CHANGES_REQUESTED"],"media_status": ["PENDING", "READY"],"notification_channel": ["TELEGRAM", "EMAIL"],"outbox_status": ["PENDING", "SENT", "FAILED", "SKIPPED"],"project_status": ["DRAFT", "PLANNING", "SHOOT_DAY", "PROOFING", "SELECTION_SUBMITTED", "RETOUCHING", "DELIVERED", "COMPLETED"],"recipient_type": ["PHOTOGRAPHER", "CLIENT"],"retouch_order_status": ["PENDING", "PAID", "CANCELLED"],"selection_type": ["INCLUDED", "EXTRA"],"shot_status": ["PENDING", "SHOT", "REJECTED"],"workspace_role": ["OWNER", "ASSISTANT"]
           }
         }
 } as const
