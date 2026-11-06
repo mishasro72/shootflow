@@ -23,6 +23,9 @@ jobs:
       contents: write
     env:
       NEXT_TELEMETRY_DISABLED: "1"
+      # A placeholder so the place search shows up in e2e tests; the tests answer the
+      # browser's /api/places request
+      GOOGLE_MAPS_API_KEY: e2e-placeholder
     steps:
       - uses: actions/checkout@v5
 
@@ -44,6 +47,11 @@ jobs:
             echo "::warning::pnpm-lock.yaml is out of date; resolving dependencies fresh."
             scripts/ci-run.sh "Install" pnpm install --no-frozen-lockfile
             echo "generated=true" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event_name }}" = "push" ] && [[ "${{ github.ref }}" == refs/heads/claude/* ]]; then
+            # Mentor check branches may add dependencies without a lockfile; resolve, don't commit.
+            echo "::warning::pnpm-lock.yaml is out of date; resolving dependencies fresh (not committed)."
+            scripts/ci-run.sh "Install" pnpm install --no-frozen-lockfile
+            echo "generated=false" >> "$GITHUB_OUTPUT"
           else
             exit 1
           fi

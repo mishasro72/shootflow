@@ -10,6 +10,9 @@ const schema = z.object({
   NEXT_PUBLIC_APP_URL: z.url().default("http://localhost:3000"),
   NEXT_PUBLIC_SUPABASE_URL: z.url(),
   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: z.string().min(1),
+  // Server-only key for Places API (New). Without it the place search is hidden and
+  // locations are typed by hand.
+  GOOGLE_MAPS_API_KEY: z.string().min(1).optional(),
 });
 
 export type Env = z.infer<typeof schema>;
@@ -17,9 +20,7 @@ export type Env = z.infer<typeof schema>;
 export function parseEnv(source: Record<string, string | undefined>): Env {
   const result = schema.safeParse(source);
   if (!result.success) {
-    const issues = result.error.issues
-      .map((issue) => `  ${issue.path.join(".")}: ${issue.message}`)
-      .join("\n");
+    const issues = result.error.issues.map((issue) => `  ${issue.path.join(".")}: ${issue.message}`).join("\n");
     throw new Error(`Invalid environment variables:\n${issues}`);
   }
   return result.data;
