@@ -24,17 +24,18 @@ set local request.jwt.claims to '{"sub":"00000000-0000-0000-0000-0000000000d1","
 set local role authenticated;
 
 select lives_ok(
-  $$ insert into public.media_files (id, project_id, workspace_id, file_name, content_type, size_bytes)
-     values ('d2000000-0000-0000-0000-000000000001', 'd1000000-0000-0000-0000-000000000001', '0000000d-0000-0000-0000-000000000000', 'a.jpg', 'image/jpeg', 600) $$,
+  $$ insert into public.media_files (project_id, workspace_id, file_name, content_type, size_bytes)
+     values ('d1000000-0000-0000-0000-000000000001', '0000000d-0000-0000-0000-000000000000', 'a.jpg', 'image/jpeg', 600) $$,
   'a photographer can reserve an upload in their project'
 );
 select is(
-  (select object_key from public.media_files where id = 'd2000000-0000-0000-0000-000000000001'),
-  'ws/0000000d-0000-0000-0000-000000000000/projects/d1000000-0000-0000-0000-000000000001/files/d2000000-0000-0000-0000-000000000001',
+  (select object_key from public.media_files where file_name = 'a.jpg'),
+  (select format('ws/0000000d-0000-0000-0000-000000000000/projects/d1000000-0000-0000-0000-000000000001/files/%s', id)
+   from public.media_files where file_name = 'a.jpg'),
   'the object key is made from the studio, project and file ids'
 );
 select is(
-  (select status from public.media_files where id = 'd2000000-0000-0000-0000-000000000001'),
+  (select status from public.media_files where file_name = 'a.jpg'),
   'PENDING'::public.media_status,
   'a new upload starts as PENDING'
 );
@@ -49,7 +50,7 @@ select throws_ok(
   '42501', null, 'the caller cannot choose an object key'
 );
 select throws_ok(
-  $$ update public.media_files set status = 'READY' where id = 'd2000000-0000-0000-0000-000000000001' $$,
+  $$ update public.media_files set status = 'READY' where file_name = 'a.jpg' $$,
   '42501', null, 'only the server can mark an upload READY'
 );
 select throws_ok(
@@ -63,7 +64,7 @@ select throws_ok(
 reset role;
 set local request.jwt.claims to '';
 
-update public.media_files set status = 'READY', uploaded_at = now() where id = 'd2000000-0000-0000-0000-000000000001';
+update public.media_files set status = 'READY', uploaded_at = now() where file_name = 'a.jpg';
 select is(
   (select storage_used_bytes from public.workspaces where id = '0000000d-0000-0000-0000-000000000000'),
   600::bigint,
@@ -83,7 +84,7 @@ select is(
 -- Deleting gives the space back.
 set local request.jwt.claims to '{"sub":"00000000-0000-0000-0000-0000000000d1","role":"authenticated"}';
 set local role authenticated;
-delete from public.media_files where id = 'd2000000-0000-0000-0000-000000000001';
+delete from public.media_files where file_name = 'a.jpg';
 reset role;
 set local request.jwt.claims to '';
 
