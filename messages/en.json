@@ -85,6 +85,15 @@
     "lead": "Profile, studio and notifications.",
     "appearanceTitle": "Appearance",
     "appearanceLead": "Theme and interface language. The language is saved to your profile and follows you across devices.",
+    "calendarTitle": "Calendar",
+    "calendarLead": "All your studio's shoots in your calendar app. It updates by itself when you change a project.",
+    "calendarSubscribe": "Subscribe",
+    "calendarCopy": "Copy link",
+    "calendarHint": "Apple Calendar and Outlook: press Subscribe. Google Calendar: Other calendars → From URL, then paste the link. Keep the link private: anyone with it sees your shoots.",
+    "calendarRotate": "New link",
+    "calendarRotateConfirm": "Calendars subscribed with the old link will stop updating.",
+    "calendarRotateYes": "Yes, make a new one",
+    "calendarRotateNo": "Cancel",
     "comingSoon": "Profile, studio, watermark and Telegram settings arrive in the next steps."
   },
   "Portal": {
@@ -175,6 +184,29 @@
     "lightEveningBlue": "Evening blue hour",
     "lightNone": "—",
     "lightAdvice": "The shoot misses golden hour. {window, select, morning {Morning} other {Evening}} golden hour: {range}.",
-    "lightShift": "Start at {time}"
+    "lightShift": "Start at {time}",
+    "addToCalendar": "Add to calendar",
+    "rotateLink": "New link",
+    "rotateConfirm": "The current link will stop working at once.",
+    "rotateYes": "Yes, make a new one",
+    "rotateNo": "Cancel",
+    "pinOff": "No PIN: anyone with the link can open the page.",
+    "pinOn": "PIN is on: the client enters it to open the page.",
+    "pinLabel": "Set a 4-digit PIN",
+    "pinChange": "New PIN",
+    "pinSave": "Save PIN",
+    "pinRemove": "Remove PIN",
+    "pinInvalid": "Use exactly 4 digits.",
+    "pinSaved": "PIN saved. Send it to your client separately from the link.",
+    "pinError": "Could not save the PIN. Please try again.",
+    "secretsOff": "New links and PINs need the Supabase secret key on the server (SUPABASE_SECRET_KEY)."
+  },
+  "Calendar": {
+    "summaryWithClient": "{title} · {client}",
+    "summaryForClient": "{title} · {studio}",
+    "projectLink": "Project in ShootFlow: {url}",
+    "clientLink": "Your shoot page: {url}",
+    "mapLink": "Map: {url}",
+    "feedName": "ShootFlow · {studio}"
   }
 }

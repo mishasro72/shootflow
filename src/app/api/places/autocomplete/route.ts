@@ -4,11 +4,12 @@ import { z } from "zod";
 import { locales } from "@/i18n/config";
 import { getCurrentUser } from "@/lib/auth/session";
 import { autocompletePlaces, PlacesUnavailableError } from "@/lib/places/google";
+import { sessionTokenSchema } from "@/lib/places/schemas";
 
 /** GET /api/places/autocomplete?q=dix+park&session=<uuid>&lang=en */
 const query = z.object({
   q: z.string().trim().min(3).max(200),
-  session: z.string().regex(/^[A-Za-z0-9_-]{1,36}$/),
+  session: sessionTokenSchema,
   lang: z.enum(locales),
 });
 

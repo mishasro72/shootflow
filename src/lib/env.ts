@@ -13,6 +13,10 @@ const schema = z.object({
   // Server-only key for Places API (New). Without it the place search is hidden and
   // locations are typed by hand.
   GOOGLE_MAPS_API_KEY: z.string().min(1).optional(),
+  // Server-only Supabase secret key (sb_secret_..., or the legacy service_role key). It
+  // bypasses RLS, so only code that checked access first may use it: client portal and
+  // calendar feed handlers, and the writes of portal secrets.
+  SUPABASE_SECRET_KEY: z.string().min(1).optional(),
 });
 
 export type Env = z.infer<typeof schema>;

@@ -85,6 +85,15 @@
     "lead": "Профиль, студия и уведомления.",
     "appearanceTitle": "Внешний вид",
     "appearanceLead": "Тема и язык интерфейса. Язык сохраняется в профиле и действует на всех устройствах.",
+    "calendarTitle": "Календарь",
+    "calendarLead": "Все съёмки студии в вашем календаре. Он обновляется сам, когда вы меняете проект.",
+    "calendarSubscribe": "Подписаться",
+    "calendarCopy": "Скопировать ссылку",
+    "calendarHint": "Apple Calendar и Outlook: нажмите «Подписаться». Google Calendar: «Другие календари» → «Добавить по URL» и вставьте ссылку. Не публикуйте ссылку: по ней видны все ваши съёмки.",
+    "calendarRotate": "Новая ссылка",
+    "calendarRotateConfirm": "Календари, подписанные по старой ссылке, перестанут обновляться.",
+    "calendarRotateYes": "Да, создать новую",
+    "calendarRotateNo": "Отмена",
     "comingSoon": "Настройки профиля, студии, водяного знака и Telegram появятся в следующих шагах."
   },
   "Portal": {
@@ -175,6 +184,29 @@
     "lightEveningBlue": "Вечерний синий час",
     "lightNone": "—",
     "lightAdvice": "Съёмка не попадает в золотой час. {window, select, morning {Утренний} other {Вечерний}} золотой час: {range}.",
-    "lightShift": "Начать в {time}"
+    "lightShift": "Начать в {time}",
+    "addToCalendar": "Добавить в календарь",
+    "rotateLink": "Новая ссылка",
+    "rotateConfirm": "Текущая ссылка сразу перестанет работать.",
+    "rotateYes": "Да, создать новую",
+    "rotateNo": "Отмена",
+    "pinOff": "PIN не задан: страницу откроет любой, у кого есть ссылка.",
+    "pinOn": "PIN включён: клиент вводит его, чтобы открыть страницу.",
+    "pinLabel": "Задать PIN из 4 цифр",
+    "pinChange": "Новый PIN",
+    "pinSave": "Сохранить PIN",
+    "pinRemove": "Убрать PIN",
+    "pinInvalid": "Нужно ровно 4 цифры.",
+    "pinSaved": "PIN сохранён. Отправьте его клиенту отдельно от ссылки.",
+    "pinError": "Не удалось сохранить PIN. Попробуйте ещё раз.",
+    "secretsOff": "Для новых ссылок и PIN на сервере нужен секретный ключ Supabase (SUPABASE_SECRET_KEY)."
+  },
+    "Calendar": {
+    "summaryWithClient": "{title} · {client}",
+    "summaryForClient": "{title} · {studio}",
+    "projectLink": "Проект в ShootFlow: {url}",
+    "clientLink": "Страница вашей съёмки: {url}",
+    "mapLink": "Карта: {url}",
+    "feedName": "ShootFlow · {studio}"
   }
 }

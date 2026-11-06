@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { googleMapsUrl, isCoordsFresh, PLACE_ID_PATTERN } from "./policy";
+import { googleMapsUrl, isCoordsFresh } from "./policy";
 
 describe("isCoordsFresh", () => {
   const now = new Date("2026-11-30T12:00:00Z");
@@ -27,13 +27,5 @@ describe("googleMapsUrl", () => {
 
   it("falls back to the place ID when there is no name", () => {
     expect(new URL(googleMapsUrl("  ", "ChIJabc")).searchParams.get("query")).toBe("ChIJabc");
-  });
-});
-
-describe("PLACE_ID_PATTERN", () => {
-  it("accepts place IDs and rejects anything that could break a URL", () => {
-    expect(PLACE_ID_PATTERN.test("ChIJN1t_tDeuEmsRUsoyG83frY4")).toBe(true);
-    expect(PLACE_ID_PATTERN.test("../etc")).toBe(false);
-    expect(PLACE_ID_PATTERN.test("")).toBe(false);
   });
 });
