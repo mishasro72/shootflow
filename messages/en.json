@@ -115,6 +115,14 @@
     "endTime": "End",
     "timezone": "Time zone",
     "timezoneHint": "Shoot times are in the location's local time.",
+    "placeSearch": "Find on Google Maps",
+    "placeSearchPlaceholder": "Studio, park, address",
+    "placeNoResults": "Nothing found. Try another name, or fill in the fields by hand.",
+    "placeError": "Could not reach Google Maps. Try again, or fill in the fields by hand.",
+    "placeLinked": "Linked to Google Maps: map link and golden hour.",
+    "placeOpenMap": "Open map",
+    "placeUnlink": "Unlink",
+    "poweredBy": "Google Maps",
     "locationName": "Place name",
     "locationNamePlaceholder": "Studio, park, café",
     "locationAddress": "Address",
@@ -156,6 +164,17 @@
     "noNotes": "No notes",
     "clientLink": "Client link",
     "clientLinkLead": "Send this to your client: it opens their shoot page without signing up. The client page is still in development.",
-    "copyLink": "Copy"
+    "copyLink": "Copy",
+    "openMap": "Open in Google Maps",
+    "light": "Light on the shoot day",
+    "lightMorningBlue": "Morning blue hour",
+    "lightMorningGolden": "Morning golden hour",
+    "lightSunrise": "Sunrise",
+    "lightSunset": "Sunset",
+    "lightEveningGolden": "Evening golden hour",
+    "lightEveningBlue": "Evening blue hour",
+    "lightNone": "—",
+    "lightAdvice": "The shoot misses golden hour. {window, select, morning {Morning} other {Evening}} golden hour: {range}.",
+    "lightShift": "Start at {time}"
   }
 }

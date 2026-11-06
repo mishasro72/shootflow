@@ -115,6 +115,14 @@
     "endTime": "Окончание",
     "timezone": "Часовой пояс",
     "timezoneHint": "Время съёмки указывается по местному времени локации.",
+    "placeSearch": "Найти в Google Maps",
+    "placeSearchPlaceholder": "Студия, парк, адрес",
+    "placeNoResults": "Ничего не нашлось. Попробуйте другое название или заполните поля вручную.",
+    "placeError": "Не удалось связаться с Google Maps. Попробуйте ещё раз или заполните поля вручную.",
+    "placeLinked": "Привязано к Google Maps: ссылка на карту и золотой час.",
+    "placeOpenMap": "Открыть карту",
+    "placeUnlink": "Отвязать",
+    "poweredBy": "Google Maps",
     "locationName": "Название места",
     "locationNamePlaceholder": "Студия, парк, кафе",
     "locationAddress": "Адрес",
@@ -156,6 +164,17 @@
     "noNotes": "Заметок нет",
     "clientLink": "Ссылка для клиента",
     "clientLinkLead": "Отправьте её клиенту: по ней он откроет страницу съёмки без регистрации. Страница клиента сейчас в разработке.",
-    "copyLink": "Скопировать"
+    "copyLink": "Скопировать",
+    "openMap": "Открыть в Google Maps",
+    "light": "Свет в день съёмки",
+    "lightMorningBlue": "Утренний синий час",
+    "lightMorningGolden": "Утренний золотой час",
+    "lightSunrise": "Восход",
+    "lightSunset": "Закат",
+    "lightEveningGolden": "Вечерний золотой час",
+    "lightEveningBlue": "Вечерний синий час",
+    "lightNone": "—",
+    "lightAdvice": "Съёмка не попадает в золотой час. {window, select, morning {Утренний} other {Вечерний}} золотой час: {range}.",
+    "lightShift": "Начать в {time}"
   }
 }

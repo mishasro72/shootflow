@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 
 import { getPhotographerContext } from "@/lib/auth/session";
+import { getEnv } from "@/lib/env";
 import { listTimeZones } from "@/lib/time/time-zones";
 
 import { createProject } from "../actions";
@@ -28,6 +29,9 @@ export default async function NewProjectPage() {
     timezone: context.profile.timezone,
     locationName: "",
     locationAddress: "",
+    placeId: "",
+    placeLat: "",
+    placeLng: "",
     notes: "",
     retouchLimit: String(context.workspace.default_retouch_limit),
     clientLocale: context.workspace.default_locale,
@@ -42,6 +46,7 @@ export default async function NewProjectPage() {
         action={createProject}
         defaultValues={defaults}
         timeZones={listTimeZones(defaults.timezone)}
+        mapsEnabled={Boolean(getEnv().GOOGLE_MAPS_API_KEY)}
         submitLabel={t("create")}
         cancelHref="/dashboard"
       />

@@ -26,6 +26,7 @@
     "check": "pnpm lint && pnpm typecheck && pnpm i18n:check && pnpm test"
   },
   "dependencies": {
+    "@photostructure/tz-lookup": "^11.8.0",
     "@radix-ui/react-slot": "^1.2.3",
     "@supabase/ssr": "^0.7.0",
     "@supabase/supabase-js": "^2.100.0",
@@ -39,6 +40,7 @@
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "server-only": "^0.0.1",
+    "suncalc": "^1.9.0",
     "tailwind-merge": "^3.3.0",
     "zod": "^4.0.0"
   },
@@ -51,6 +53,7 @@
     "@types/node": "^22.0.0",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
+    "@types/suncalc": "^1.9.2",
     "@vitejs/plugin-react": "^5.0.0",
     "eslint": "^9.30.0",
     "eslint-config-next": "^16.0.0",
