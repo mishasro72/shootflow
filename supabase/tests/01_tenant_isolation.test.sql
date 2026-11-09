@@ -5,6 +5,7 @@ create extension if not exists pgtap with schema extensions;
 set search_path = public, extensions;
 
 select plan(46);
+select plan(49);
 
 -- Fixtures (as the database owner) --------------------------------------------
 
@@ -52,6 +53,9 @@ values ('a0000000-0000-0000-0000-000000000001', '0000000a-0000-0000-0000-0000000
 insert into public.extra_retouch_orders (project_id, workspace_id, quantity, unit_price_cents)
 values ('a0000000-0000-0000-0000-000000000001', '0000000a-0000-0000-0000-000000000000', 2, 1500);
 
+insert into public.media_files (id, project_id, workspace_id, file_name, content_type, size_bytes)
+values ('a0000000-0000-0000-0000-0000000000a9', 'a0000000-0000-0000-0000-000000000001', '0000000a-0000-0000-0000-000000000000', 'moodboard.jpg', 'image/jpeg', 1024);
+
 insert into public.activity_events (project_id, workspace_id, type, actor_type)
 values ('a0000000-0000-0000-0000-000000000001', '0000000a-0000-0000-0000-000000000000', 'concept.status_changed', 'CLIENT');
 
@@ -90,6 +94,7 @@ select is((select count(*)::integer from public.comments), 0, 'B cannot read A''
 select is((select count(*)::integer from public.extra_retouch_orders), 0, 'B cannot read A''s retouch orders');
 select is((select count(*)::integer from public.activity_events), 0, 'B cannot read A''s activity');
 select is((select count(*)::integer from public.notification_endpoints), 0, 'B cannot read A''s notification endpoints');
+select is((select count(*)::integer from public.media_files), 0, 'B cannot read A''s files');
 select is((select count(*)::integer from public.plans), 1, 'plans are readable reference data');
 
 -- Writes against A's rows affect nothing.
@@ -105,6 +110,7 @@ delete from public.projects where id = 'a0000000-0000-0000-0000-000000000001';
 delete from public.concept_items where id = 'a0000000-0000-0000-0000-0000000000d1';
 delete from public.photos where id = 'a0000000-0000-0000-0000-0000000000f1';
 delete from public.comments where project_id = 'a0000000-0000-0000-0000-000000000001';
+delete from public.media_files where id = 'a0000000-0000-0000-0000-0000000000a9';
 
 -- Inserts into A's workspace or project are rejected.
 select throws_ok(
@@ -126,6 +132,10 @@ select throws_ok(
 select throws_ok(
   $$ insert into public.comments (project_id, workspace_id, concept_item_id, author_type, author_name, text) values ('a0000000-0000-0000-0000-000000000001', '0000000b-0000-0000-0000-000000000000', 'a0000000-0000-0000-0000-0000000000d1', 'PHOTOGRAPHER', 'B', 'hi') $$,
   '42501', null, 'B cannot comment on A''s card'
+);
+select throws_ok(
+  $$ insert into public.media_files (project_id, workspace_id, file_name, content_type, size_bytes) values ('a0000000-0000-0000-0000-000000000001', '0000000b-0000-0000-0000-000000000000', 'x.jpg', 'image/jpeg', 10) $$,
+  '42501', null, 'B cannot upload into A''s project, even claiming their own workspace'
 );
 select throws_ok(
   $$ insert into public.notification_endpoints (workspace_id, recipient_type, user_id, channel, address) values ('0000000a-0000-0000-0000-000000000000', 'PHOTOGRAPHER', '00000000-0000-0000-0000-0000000000b1', 'EMAIL', 'b@example.test') $$,
@@ -188,6 +198,7 @@ select is((select title from public.concept_items where id = 'a0000000-0000-0000
 select is((select title from public.shot_list_items where id = 'a0000000-0000-0000-0000-0000000000e1'), 'Close-up', 'A''s shot is unchanged');
 select is((select original_filename from public.photos where id = 'a0000000-0000-0000-0000-0000000000f1'), 'IMG_0001.jpg', 'A''s photo is unchanged');
 select is((select count(*)::integer from public.comments where project_id = 'a0000000-0000-0000-0000-000000000001'), 1, 'A''s comment still exists');
+select is((select count(*)::integer from public.media_files where project_id = 'a0000000-0000-0000-0000-000000000001'), 1, 'A''s file still exists');
 select is((select address from public.notification_endpoints where workspace_id = '0000000a-0000-0000-0000-000000000000'), '123456', 'A''s endpoint is unchanged');
 select is((select count(*)::integer from public.workspace_members where workspace_id = '0000000a-0000-0000-0000-000000000000'), 1, 'A''s workspace has one member');
 select is((select status from public.projects where id = 'b0000000-0000-0000-0000-000000000001'), 'DRAFT'::public.project_status, 'B''s status did not change');
