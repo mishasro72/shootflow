@@ -1,6 +1,6 @@
-import { CalendarPlus, RefreshCw } from "lucide-react";
+import { CalendarPlus, HardDrive, RefreshCw } from "lucide-react";
 import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 
 import { ConfirmButton } from "@/components/confirm-button";
@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getPhotographerContext } from "@/lib/auth/session";
 import { getEnv } from "@/lib/env";
+import { formatBytes } from "@/lib/format/bytes";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 import { rotateCalendarFeed } from "./actions";
@@ -32,7 +33,7 @@ export default async function SettingsPage() {
   const supabase = await createSupabaseServerClient();
   const { data: workspace } = await supabase
     .from("workspaces")
-    .select("calendar_feed_token")
+    .select("calendar_feed_token, storage_used_bytes, plan:plans (max_storage_bytes)")
     .eq("id", context.workspace.id)
     .maybeSingle();
 
@@ -42,6 +43,10 @@ export default async function SettingsPage() {
   // webcal:// is the same address; it tells the system to open a calendar app and subscribe.
   const subscribeUrl = feedUrl?.replace(/^https?:/, "webcal:");
   const canRotate = context.role === "OWNER" && Boolean(env.SUPABASE_SECRET_KEY);
+
+  const locale = await getLocale();
+  const used = workspace?.storage_used_bytes ?? 0;
+  const limit = workspace?.plan?.max_storage_bytes ?? 0;
 
   return (
     <div className="flex max-w-2xl flex-col gap-6">
@@ -98,6 +103,29 @@ export default async function SettingsPage() {
                 testId="rotate-feed"
               />
             )}
+          </CardContent>
+        </Card>
+      )}
+
+      {limit > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle as="h2" className="flex items-center gap-2">
+              <HardDrive className="size-4" aria-hidden />
+              {t("storageTitle")}
+            </CardTitle>
+            <CardDescription>{t("storageLead")}</CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-2 text-sm">
+            <p data-testid="storage-used" data-bytes={used}>
+              {t("storageUsed", { used: formatBytes(used, locale), limit: formatBytes(limit, locale) })}
+            </p>
+            <progress
+              value={used}
+              max={limit}
+              aria-label={t("storageTitle")}
+              className="h-2 w-full overflow-hidden rounded-full [&::-moz-progress-bar]:bg-primary [&::-webkit-progress-bar]:bg-muted [&::-webkit-progress-value]:bg-primary"
+            />
           </CardContent>
         </Card>
       )}

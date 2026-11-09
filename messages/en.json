@@ -7,7 +7,7 @@
     "eyebrow": "For portrait photographers",
     "title": "Every shoot, from moodboard to final gallery",
     "lead": "Agree on looks with your model through one link, run the shot list on set, and deliver the finals without the back-and-forth.",
-    "status": "In development: step 5 of 13",
+    "status": "In development: step 6 of 13",
     "signIn": "Sign in",
     "getStarted": "Create account"
   },
@@ -94,6 +94,9 @@
     "calendarRotateConfirm": "Calendars subscribed with the old link will stop updating.",
     "calendarRotateYes": "Yes, make a new one",
     "calendarRotateNo": "Cancel",
+    "storageTitle": "Storage",
+    "storageLead": "Photos and files of all your projects.",
+    "storageUsed": "{used} of {limit} used",
     "comingSoon": "Profile, studio, watermark and Telegram settings arrive in the next steps."
   },
   "Portal": {
@@ -208,5 +211,35 @@
     "clientLink": "Your shoot page: {url}",
     "mapLink": "Map: {url}",
     "feedName": "ShootFlow · {studio}"
+  },
+
+  "Uploader": {
+    "drop": "Drop photos or PDF files here, or click to choose",
+    "hint": "Images and PDF, up to 100 MB each.",
+    "status": {
+      "waiting": "Waiting",
+      "uploading": "Uploading…",
+      "done": "Uploaded",
+      "error": "Not uploaded"
+    },
+    "errors": {
+      "empty": "The file is empty",
+      "tooLarge": "Larger than 100 MB",
+      "type": "Only images and PDF",
+      "quota": "Not enough storage left",
+      "failed": "Could not upload, try again"
+    }
+  },
+  "Files": {
+    "title": "Files",
+    "lead": "References, briefs and anything else for this shoot. Only you can see them.",
+    "empty": "No files yet.",
+    "download": "Download",
+    "downloadFile": "Download {name}",
+    "delete": "Delete",
+    "deleteConfirm": "Delete this file for good?",
+    "deleteYes": "Yes, delete",
+    "deleteNo": "Cancel",
+    "disabled": "File uploads need Cloudflare R2 and the Supabase secret key on the server."
   }
 }
