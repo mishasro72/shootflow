@@ -31,23 +31,105 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
-                },"comments": {
+                },"board_item_gear": {
                   Row: {
-                    "author_name": string,"author_type": Database["public"]['Enums']["author_type"],"concept_item_id": string | null,"created_at": string,"id": string,"photo_id": string | null,"project_id": string,"text": string,"workspace_id": string
+                    "board_item_id": string,"created_at": string,"gear_id": string,"project_id": string,"workspace_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "author_name": string,"author_type": Database["public"]['Enums']["author_type"],"concept_item_id"?: string | null,"created_at"?: string,"id"?: string,"photo_id"?: string | null,"project_id": string,"text": string,"workspace_id": string
+                    "board_item_id": string,"created_at"?: string,"gear_id": string,"project_id": string,"workspace_id": string
                   }
                   Update: {
-                    "author_name"?: string,"author_type"?: Database["public"]['Enums']["author_type"],"concept_item_id"?: string | null,"created_at"?: string,"id"?: string,"photo_id"?: string | null,"project_id"?: string,"text"?: string,"workspace_id"?: string
+                    "board_item_id"?: string,"created_at"?: string,"gear_id"?: string,"project_id"?: string,"workspace_id"?: string
                   }
                   Relationships: [
                     {
-      foreignKeyName: "comments_concept_item_id_fkey"
-      columns: ["concept_item_id"]
+      foreignKeyName: "board_item_gear_board_item_id_fkey"
+      columns: ["board_item_id"]
 isOneToOne: false
-      referencedRelation: "concept_items"
+      referencedRelation: "board_items"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "board_item_gear_gear_id_fkey"
+      columns: ["gear_id"]
+isOneToOne: false
+      referencedRelation: "gear_items"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "board_item_gear_project_id_fkey"
+      columns: ["project_id"]
+isOneToOne: false
+      referencedRelation: "projects"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "board_item_gear_workspace_id_fkey"
+      columns: ["workspace_id"]
+isOneToOne: false
+      referencedRelation: "workspaces"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"board_items": {
+                  Row: {
+                    "body": string | null,"created_at": string,"deleted_at": string | null,"group_color": string | null,"group_role": Database["public"]['Enums']["board_group_role"] | null,"height": number | null,"id": string,"image_key": string | null,"in_shot_list": boolean,"kind": Database["public"]['Enums']["board_item_kind"],"parent_id": string | null,"payload": NonNullable<Json>,"project_id": string,"sort_order": number,"status": Database["public"]['Enums']["review_status"] | null,"status_changed_at": string | null,"technique_note": string | null,"thumb_key": string | null,"title": string,"updated_at": string,"visibility": Database["public"]['Enums']["board_visibility"],"width": number | null,"workspace_id": string,"x": number,"y": number,"z": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "body"?: string | null,"created_at"?: string,"deleted_at"?: string | null,"group_color"?: string | null,"group_role"?: Database["public"]['Enums']["board_group_role"] | null,"height"?: number | null,"id"?: string,"image_key"?: string | null,"in_shot_list"?: boolean,"kind": Database["public"]['Enums']["board_item_kind"],"parent_id"?: string | null,"payload"?: NonNullable<Json>,"project_id": string,"sort_order"?: number,"status"?: Database["public"]['Enums']["review_status"] | null,"status_changed_at"?: string | null,"technique_note"?: string | null,"thumb_key"?: string | null,"title"?: string,"updated_at"?: string,"visibility"?: Database["public"]['Enums']["board_visibility"],"width"?: number | null,"workspace_id": string,"x"?: number,"y"?: number,"z"?: number
+                  }
+                  Update: {
+                    "body"?: string | null,"created_at"?: string,"deleted_at"?: string | null,"group_color"?: string | null,"group_role"?: Database["public"]['Enums']["board_group_role"] | null,"height"?: number | null,"id"?: string,"image_key"?: string | null,"in_shot_list"?: boolean,"kind"?: Database["public"]['Enums']["board_item_kind"],"parent_id"?: string | null,"payload"?: NonNullable<Json>,"project_id"?: string,"sort_order"?: number,"status"?: Database["public"]['Enums']["review_status"] | null,"status_changed_at"?: string | null,"technique_note"?: string | null,"thumb_key"?: string | null,"title"?: string,"updated_at"?: string,"visibility"?: Database["public"]['Enums']["board_visibility"],"width"?: number | null,"workspace_id"?: string,"x"?: number,"y"?: number,"z"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "board_items_image_key_fkey"
+      columns: ["image_key"]
+isOneToOne: false
+      referencedRelation: "media_files"
+      referencedColumns: ["object_key"]
+    },{
+      foreignKeyName: "board_items_parent_id_fkey"
+      columns: ["parent_id"]
+isOneToOne: false
+      referencedRelation: "board_items"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "board_items_project_id_fkey"
+      columns: ["project_id"]
+isOneToOne: false
+      referencedRelation: "projects"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "board_items_thumb_key_fkey"
+      columns: ["thumb_key"]
+isOneToOne: false
+      referencedRelation: "media_files"
+      referencedColumns: ["object_key"]
+    },{
+      foreignKeyName: "board_items_workspace_id_fkey"
+      columns: ["workspace_id"]
+isOneToOne: false
+      referencedRelation: "workspaces"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"comments": {
+                  Row: {
+                    "author_name": string,"author_type": Database["public"]['Enums']["author_type"],"board_item_id": string | null,"created_at": string,"id": string,"photo_id": string | null,"pin_x": number | null,"pin_y": number | null,"project_id": string,"text": string,"workspace_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "author_name": string,"author_type": Database["public"]['Enums']["author_type"],"board_item_id"?: string | null,"created_at"?: string,"id"?: string,"photo_id"?: string | null,"pin_x"?: number | null,"pin_y"?: number | null,"project_id": string,"text": string,"workspace_id": string
+                  }
+                  Update: {
+                    "author_name"?: string,"author_type"?: Database["public"]['Enums']["author_type"],"board_item_id"?: string | null,"created_at"?: string,"id"?: string,"photo_id"?: string | null,"pin_x"?: number | null,"pin_y"?: number | null,"project_id"?: string,"text"?: string,"workspace_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "comments_board_item_id_fkey"
+      columns: ["board_item_id"]
+isOneToOne: false
+      referencedRelation: "board_items"
       referencedColumns: ["id"]
     },{
       foreignKeyName: "comments_photo_id_fkey"
@@ -63,32 +145,6 @@ isOneToOne: false
       referencedColumns: ["id"]
     },{
       foreignKeyName: "comments_workspace_id_fkey"
-      columns: ["workspace_id"]
-isOneToOne: false
-      referencedRelation: "workspaces"
-      referencedColumns: ["id"]
-    }
-                  ]
-                },"concept_items": {
-                  Row: {
-                    "category": Database["public"]['Enums']["concept_category"],"created_at": string,"description": string | null,"id": string,"image_key": string | null,"is_checked": boolean,"project_id": string,"sort_order": number,"status": Database["public"]['Enums']["concept_status"],"status_changed_at": string | null,"title": string,"updated_at": string,"visible_to_client": boolean,"workspace_id": string
-                  }
-                  ComputedFields: never
-                  Insert: {
-                    "category": Database["public"]['Enums']["concept_category"],"created_at"?: string,"description"?: string | null,"id"?: string,"image_key"?: string | null,"is_checked"?: boolean,"project_id": string,"sort_order"?: number,"status"?: Database["public"]['Enums']["concept_status"],"status_changed_at"?: string | null,"title"?: string,"updated_at"?: string,"visible_to_client": boolean,"workspace_id": string
-                  }
-                  Update: {
-                    "category"?: Database["public"]['Enums']["concept_category"],"created_at"?: string,"description"?: string | null,"id"?: string,"image_key"?: string | null,"is_checked"?: boolean,"project_id"?: string,"sort_order"?: number,"status"?: Database["public"]['Enums']["concept_status"],"status_changed_at"?: string | null,"title"?: string,"updated_at"?: string,"visible_to_client"?: boolean,"workspace_id"?: string
-                  }
-                  Relationships: [
-                    {
-      foreignKeyName: "concept_items_project_id_fkey"
-      columns: ["project_id"]
-isOneToOne: false
-      referencedRelation: "projects"
-      referencedColumns: ["id"]
-    },{
-      foreignKeyName: "concept_items_workspace_id_fkey"
       columns: ["workspace_id"]
 isOneToOne: false
       referencedRelation: "workspaces"
@@ -115,6 +171,26 @@ isOneToOne: false
       referencedColumns: ["id"]
     },{
       foreignKeyName: "extra_retouch_orders_workspace_id_fkey"
+      columns: ["workspace_id"]
+isOneToOne: false
+      referencedRelation: "workspaces"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"gear_items": {
+                  Row: {
+                    "archived_at": string | null,"created_at": string,"id": string,"kind": Database["public"]['Enums']["gear_kind"],"name": string,"notes": string | null,"sort_order": number,"updated_at": string,"workspace_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "archived_at"?: string | null,"created_at"?: string,"id"?: string,"kind": Database["public"]['Enums']["gear_kind"],"name": string,"notes"?: string | null,"sort_order"?: number,"updated_at"?: string,"workspace_id": string
+                  }
+                  Update: {
+                    "archived_at"?: string | null,"created_at"?: string,"id"?: string,"kind"?: Database["public"]['Enums']["gear_kind"],"name"?: string,"notes"?: string | null,"sort_order"?: number,"updated_at"?: string,"workspace_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "gear_items_workspace_id_fkey"
       columns: ["workspace_id"]
 isOneToOne: false
       referencedRelation: "workspaces"
@@ -155,14 +231,14 @@ isOneToOne: false
                   ]
                 },"media_files": {
                   Row: {
-                    "content_type": string,"created_at": string,"file_name": string,"id": string,"object_key": string,"project_id": string,"size_bytes": number,"status": Database["public"]['Enums']["media_status"],"uploaded_at": string | null,"workspace_id": string
+                    "content_type": string,"created_at": string,"file_name": string,"id": string,"object_key": string,"project_id": string,"purpose": Database["public"]['Enums']["media_purpose"],"size_bytes": number,"status": Database["public"]['Enums']["media_status"],"uploaded_at": string | null,"workspace_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "content_type": string,"created_at"?: string,"file_name": string,"id"?: string,"object_key"?: string,"project_id": string,"size_bytes": number,"status"?: Database["public"]['Enums']["media_status"],"uploaded_at"?: string | null,"workspace_id": string
+                    "content_type": string,"created_at"?: string,"file_name": string,"id"?: string,"object_key"?: string,"project_id": string,"purpose"?: Database["public"]['Enums']["media_purpose"],"size_bytes": number,"status"?: Database["public"]['Enums']["media_status"],"uploaded_at"?: string | null,"workspace_id": string
                   }
                   Update: {
-                    "content_type"?: string,"created_at"?: string,"file_name"?: string,"id"?: string,"object_key"?: string,"project_id"?: string,"size_bytes"?: number,"status"?: Database["public"]['Enums']["media_status"],"uploaded_at"?: string | null,"workspace_id"?: string
+                    "content_type"?: string,"created_at"?: string,"file_name"?: string,"id"?: string,"object_key"?: string,"project_id"?: string,"purpose"?: Database["public"]['Enums']["media_purpose"],"size_bytes"?: number,"status"?: Database["public"]['Enums']["media_status"],"uploaded_at"?: string | null,"workspace_id"?: string
                   }
                   Relationships: [
                     {
@@ -323,6 +399,38 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"project_gear": {
+                  Row: {
+                    "created_at": string,"custom_kind": Database["public"]['Enums']["gear_kind"] | null,"custom_name": string | null,"gear_id": string | null,"id": string,"is_packed": boolean,"project_id": string,"sort_order": number,"source": Database["public"]['Enums']["gear_source"],"updated_at": string,"workspace_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"custom_kind"?: Database["public"]['Enums']["gear_kind"] | null,"custom_name"?: string | null,"gear_id"?: string | null,"id"?: string,"is_packed"?: boolean,"project_id": string,"sort_order"?: number,"source"?: Database["public"]['Enums']["gear_source"],"updated_at"?: string,"workspace_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"custom_kind"?: Database["public"]['Enums']["gear_kind"] | null,"custom_name"?: string | null,"gear_id"?: string | null,"id"?: string,"is_packed"?: boolean,"project_id"?: string,"sort_order"?: number,"source"?: Database["public"]['Enums']["gear_source"],"updated_at"?: string,"workspace_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "project_gear_gear_id_fkey"
+      columns: ["gear_id"]
+isOneToOne: false
+      referencedRelation: "gear_items"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "project_gear_project_id_fkey"
+      columns: ["project_id"]
+isOneToOne: false
+      referencedRelation: "projects"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "project_gear_workspace_id_fkey"
+      columns: ["workspace_id"]
+isOneToOne: false
+      referencedRelation: "workspaces"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"projects": {
                   Row: {
                     "access_token": string,"archived_at": string | null,"client_locale": string,"completed_at": string | null,"created_at": string,"delivered_at": string | null,"extra_retouch_enabled": boolean,"google_place_id": string | null,"id": string,"location_address": string | null,"location_lat": number | null,"location_lng": number | null,"location_map_url": string | null,"location_name": string | null,"notes": string | null,"pin_failed_attempts": number,"pin_hash": string | null,"pin_locked_until": string | null,"place_synced_at": string | null,"reminder_24h_sent_at": string | null,"retouch_limit": number,"selection_submitted_at": string | null,"shoot_end": string | null,"shoot_start": string | null,"status": Database["public"]['Enums']["project_status"],"timezone": string,"title": string,"updated_at": string,"workspace_id": string
@@ -343,23 +451,61 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
-                },"shot_list_items": {
+                },"shot_list_item_gear": {
                   Row: {
-                    "concept_item_id": string | null,"created_at": string,"description": string | null,"id": string,"project_id": string,"reference_image_key": string | null,"reject_reason": string | null,"shot_status": Database["public"]['Enums']["shot_status"],"sort_order": number,"status_changed_at": string | null,"title": string,"updated_at": string,"workspace_id": string
+                    "gear_id": string,"project_id": string,"shot_list_item_id": string,"workspace_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "concept_item_id"?: string | null,"created_at"?: string,"description"?: string | null,"id"?: string,"project_id": string,"reference_image_key"?: string | null,"reject_reason"?: string | null,"shot_status"?: Database["public"]['Enums']["shot_status"],"sort_order"?: number,"status_changed_at"?: string | null,"title"?: string,"updated_at"?: string,"workspace_id": string
+                    "gear_id": string,"project_id": string,"shot_list_item_id": string,"workspace_id": string
                   }
                   Update: {
-                    "concept_item_id"?: string | null,"created_at"?: string,"description"?: string | null,"id"?: string,"project_id"?: string,"reference_image_key"?: string | null,"reject_reason"?: string | null,"shot_status"?: Database["public"]['Enums']["shot_status"],"sort_order"?: number,"status_changed_at"?: string | null,"title"?: string,"updated_at"?: string,"workspace_id"?: string
+                    "gear_id"?: string,"project_id"?: string,"shot_list_item_id"?: string,"workspace_id"?: string
                   }
                   Relationships: [
                     {
-      foreignKeyName: "shot_list_items_concept_item_id_fkey"
-      columns: ["concept_item_id"]
+      foreignKeyName: "shot_list_item_gear_gear_id_fkey"
+      columns: ["gear_id"]
 isOneToOne: false
-      referencedRelation: "concept_items"
+      referencedRelation: "gear_items"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "shot_list_item_gear_project_id_fkey"
+      columns: ["project_id"]
+isOneToOne: false
+      referencedRelation: "projects"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "shot_list_item_gear_shot_list_item_id_fkey"
+      columns: ["shot_list_item_id"]
+isOneToOne: false
+      referencedRelation: "shot_list_items"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "shot_list_item_gear_workspace_id_fkey"
+      columns: ["workspace_id"]
+isOneToOne: false
+      referencedRelation: "workspaces"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"shot_list_items": {
+                  Row: {
+                    "board_item_id": string | null,"collage_keys": (string)[],"created_at": string,"description": string | null,"id": string,"project_id": string,"reference_image_key": string | null,"reject_reason": string | null,"shot_status": Database["public"]['Enums']["shot_status"],"sort_order": number,"status_changed_at": string | null,"technique_note": string | null,"title": string,"updated_at": string,"visibility": Database["public"]['Enums']["board_visibility"],"workspace_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "board_item_id"?: string | null,"collage_keys"?: (string)[],"created_at"?: string,"description"?: string | null,"id"?: string,"project_id": string,"reference_image_key"?: string | null,"reject_reason"?: string | null,"shot_status"?: Database["public"]['Enums']["shot_status"],"sort_order"?: number,"status_changed_at"?: string | null,"technique_note"?: string | null,"title"?: string,"updated_at"?: string,"visibility"?: Database["public"]['Enums']["board_visibility"],"workspace_id": string
+                  }
+                  Update: {
+                    "board_item_id"?: string | null,"collage_keys"?: (string)[],"created_at"?: string,"description"?: string | null,"id"?: string,"project_id"?: string,"reference_image_key"?: string | null,"reject_reason"?: string | null,"shot_status"?: Database["public"]['Enums']["shot_status"],"sort_order"?: number,"status_changed_at"?: string | null,"technique_note"?: string | null,"title"?: string,"updated_at"?: string,"visibility"?: Database["public"]['Enums']["board_visibility"],"workspace_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "shot_list_items_board_item_id_fkey"
+      columns: ["board_item_id"]
+isOneToOne: false
+      referencedRelation: "board_items"
       referencedColumns: ["id"]
     },{
       foreignKeyName: "shot_list_items_project_id_fkey"
@@ -374,6 +520,20 @@ isOneToOne: false
       referencedRelation: "workspaces"
       referencedColumns: ["id"]
     }
+                  ]
+                },"storage_deletions": {
+                  Row: {
+                    "attempts": number,"object_key": string,"queued_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "attempts"?: number,"object_key": string,"queued_at"?: string
+                  }
+                  Update: {
+                    "attempts"?: number,"object_key"?: string,"queued_at"?: string
+                  }
+                  Relationships: [
+                    
                   ]
                 },"workspace_members": {
                   Row: {
@@ -467,7 +627,7 @@ isOneToOne: false
       } }
           }
           Enums: {
-            "actor_type": "PHOTOGRAPHER"|"CLIENT"|"SYSTEM","author_type": "PHOTOGRAPHER"|"CLIENT","concept_category": "MOODBOARD"|"WARDROBE"|"EQUIPMENT","concept_status": "PENDING"|"APPROVED"|"CHANGES_REQUESTED","media_status": "PENDING"|"READY","notification_channel": "TELEGRAM"|"EMAIL","outbox_status": "PENDING"|"SENT"|"FAILED"|"SKIPPED","project_status": "DRAFT"|"PLANNING"|"SHOOT_DAY"|"PROOFING"|"SELECTION_SUBMITTED"|"RETOUCHING"|"DELIVERED"|"COMPLETED","recipient_type": "PHOTOGRAPHER"|"CLIENT","retouch_order_status": "PENDING"|"PAID"|"CANCELLED","selection_type": "INCLUDED"|"EXTRA","shot_status": "PENDING"|"SHOT"|"REJECTED","workspace_role": "OWNER"|"ASSISTANT"
+            "actor_type": "PHOTOGRAPHER"|"CLIENT"|"SYSTEM","author_type": "PHOTOGRAPHER"|"CLIENT","board_group_role": "LOOK"|"SECTION","board_item_kind": "GROUP"|"IMAGE"|"PALETTE"|"NOTE"|"LINK"|"LOCATION","board_visibility": "EVERYONE"|"TEAM"|"PRIVATE","gear_kind": "LENS"|"CAMERA"|"LIGHT"|"MODIFIER"|"OTHER","gear_source": "AUTO"|"MANUAL","media_purpose": "FILE"|"BOARD","media_status": "PENDING"|"READY","notification_channel": "TELEGRAM"|"EMAIL","outbox_status": "PENDING"|"SENT"|"FAILED"|"SKIPPED","project_status": "DRAFT"|"PLANNING"|"SHOOT_DAY"|"PROOFING"|"SELECTION_SUBMITTED"|"RETOUCHING"|"DELIVERED"|"COMPLETED","recipient_type": "PHOTOGRAPHER"|"CLIENT","retouch_order_status": "PENDING"|"PAID"|"CANCELLED","review_status": "PENDING"|"APPROVED"|"CHANGES_REQUESTED","selection_type": "INCLUDED"|"EXTRA","shot_status": "PENDING"|"SHOT"|"REJECTED","workspace_role": "OWNER"|"ASSISTANT"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -583,7 +743,7 @@ export type CompositeTypes<
 export const Constants = {
   "public": {
           Enums: {
-            "actor_type": ["PHOTOGRAPHER", "CLIENT", "SYSTEM"],"author_type": ["PHOTOGRAPHER", "CLIENT"],"concept_category": ["MOODBOARD", "WARDROBE", "EQUIPMENT"],"concept_status": ["PENDING", "APPROVED", "CHANGES_REQUESTED"],"media_status": ["PENDING", "READY"],"notification_channel": ["TELEGRAM", "EMAIL"],"outbox_status": ["PENDING", "SENT", "FAILED", "SKIPPED"],"project_status": ["DRAFT", "PLANNING", "SHOOT_DAY", "PROOFING", "SELECTION_SUBMITTED", "RETOUCHING", "DELIVERED", "COMPLETED"],"recipient_type": ["PHOTOGRAPHER", "CLIENT"],"retouch_order_status": ["PENDING", "PAID", "CANCELLED"],"selection_type": ["INCLUDED", "EXTRA"],"shot_status": ["PENDING", "SHOT", "REJECTED"],"workspace_role": ["OWNER", "ASSISTANT"]
+            "actor_type": ["PHOTOGRAPHER", "CLIENT", "SYSTEM"],"author_type": ["PHOTOGRAPHER", "CLIENT"],"board_group_role": ["LOOK", "SECTION"],"board_item_kind": ["GROUP", "IMAGE", "PALETTE", "NOTE", "LINK", "LOCATION"],"board_visibility": ["EVERYONE", "TEAM", "PRIVATE"],"gear_kind": ["LENS", "CAMERA", "LIGHT", "MODIFIER", "OTHER"],"gear_source": ["AUTO", "MANUAL"],"media_purpose": ["FILE", "BOARD"],"media_status": ["PENDING", "READY"],"notification_channel": ["TELEGRAM", "EMAIL"],"outbox_status": ["PENDING", "SENT", "FAILED", "SKIPPED"],"project_status": ["DRAFT", "PLANNING", "SHOOT_DAY", "PROOFING", "SELECTION_SUBMITTED", "RETOUCHING", "DELIVERED", "COMPLETED"],"recipient_type": ["PHOTOGRAPHER", "CLIENT"],"retouch_order_status": ["PENDING", "PAID", "CANCELLED"],"review_status": ["PENDING", "APPROVED", "CHANGES_REQUESTED"],"selection_type": ["INCLUDED", "EXTRA"],"shot_status": ["PENDING", "SHOT", "REJECTED"],"workspace_role": ["OWNER", "ASSISTANT"]
           }
         }
 } as const
