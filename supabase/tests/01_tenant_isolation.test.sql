@@ -241,9 +241,9 @@ select is((select name from public.profiles where id = '00000000-0000-0000-0000-
 select is((select name from public.project_clients where id = 'a0000000-0000-0000-0000-0000000000c1'), 'Model A', 'A''s client is unchanged');
 select is((select title from public.board_items where id = 'a0000000-0000-0000-0000-0000000000d1'), 'Black dress', 'A''s card is unchanged');
 select is((select name from public.gear_items where id = 'a0000000-0000-0000-0000-0000000000b8'), '85mm f/1.4', 'A''s kit is unchanged');
-select is((select count(*)::integer from public.board_item_gear), 1, 'A''s card gear still exists');
+select is((select count(*)::integer from public.board_item_gear where project_id = 'a0000000-0000-0000-0000-000000000001'), 1, 'A''s card gear still exists');
 select is((select is_packed from public.project_gear where project_id = 'a0000000-0000-0000-0000-000000000001'), false, 'A''s packing list is unchanged');
-select is((select count(*)::integer from public.shot_list_item_gear), 1, 'A''s shot gear still exists');
+select is((select count(*)::integer from public.shot_list_item_gear where project_id = 'a0000000-0000-0000-0000-000000000001'), 1, 'A''s shot gear still exists');
 select is((select title from public.shot_list_items where id = 'a0000000-0000-0000-0000-0000000000e1'), 'Close-up', 'A''s shot is unchanged');
 select is((select original_filename from public.photos where id = 'a0000000-0000-0000-0000-0000000000f1'), 'IMG_0001.jpg', 'A''s photo is unchanged');
 select is((select count(*)::integer from public.comments where project_id = 'a0000000-0000-0000-0000-000000000001'), 1, 'A''s comment still exists');
