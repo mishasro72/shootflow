@@ -4,7 +4,6 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set search_path = public, extensions;
 
-select plan(46);
 select plan(49);
 
 -- Fixtures (as the database owner) --------------------------------------------
