@@ -2,8 +2,9 @@ import { z } from "zod";
 
 /**
  * Server environment, validated on first use. Each later step adds its keys here
- * (R2, Telegram, Google Maps, Resend...). Public values the browser needs live in
- * `public-env.ts`, because Next.js only inlines literal `process.env.NEXT_PUBLIC_*` reads.
+ * (R2, Telegram, Google Maps, Resend...). Code that runs in the browser or in `proxy.ts`
+ * reads `NEXT_PUBLIC_*` values as literal `process.env.NEXT_PUBLIC_*`, because Next.js only
+ * inlines those at build time.
  */
 const schema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
@@ -25,6 +26,8 @@ const schema = z.object({
   // Only for tests: another S3-compatible server (an emulator in CI) and its region.
   R2_ENDPOINT: z.url().optional(),
   R2_REGION: z.string().min(1).default("auto"),
+  // Vercel Cron sends it as "Authorization: Bearer <CRON_SECRET>" to /api/cron/* routes.
+  CRON_SECRET: z.string().min(16).optional(),
 });
 
 export type Env = z.infer<typeof schema>;

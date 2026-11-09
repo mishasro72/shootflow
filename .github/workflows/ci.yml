@@ -26,6 +26,7 @@ jobs:
       # A placeholder so the place search shows up in e2e tests; the tests answer the
       # browser's /api/places request
       GOOGLE_MAPS_API_KEY: e2e-placeholder
+      CRON_SECRET: e2e-cron-secret-0123456789
     steps:
       - uses: actions/checkout@v5
 

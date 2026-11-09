@@ -4,7 +4,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set search_path = public, extensions;
 
-select plan(29);
+select plan(33);
 
 -- Fixtures ---------------------------------------------------------------------
 
@@ -19,18 +19,38 @@ values ('0000000a-0000-0000-0000-000000000000', '00000000-0000-0000-0000-0000000
 insert into public.projects (id, workspace_id, title, retouch_limit)
 values ('a0000000-0000-0000-0000-000000000001', '0000000a-0000-0000-0000-000000000000', 'Portrait session', 2);
 
--- Cards with every status a client can leave, plus hidden and equipment cards.
-insert into public.concept_items (id, project_id, workspace_id, category, title, status, sort_order, visible_to_client) values
-  ('c0000000-0000-0000-0000-000000000001', 'a0000000-0000-0000-0000-000000000001', '0000000a-0000-0000-0000-000000000000', 'MOODBOARD', 'Window light',   'APPROVED',          1, true),
-  ('c0000000-0000-0000-0000-000000000002', 'a0000000-0000-0000-0000-000000000001', '0000000a-0000-0000-0000-000000000000', 'MOODBOARD', 'Unanswered ref', 'PENDING',           2, true),
-  ('c0000000-0000-0000-0000-000000000003', 'a0000000-0000-0000-0000-000000000001', '0000000a-0000-0000-0000-000000000000', 'WARDROBE',  'Red coat',       'CHANGES_REQUESTED', 1, true),
-  ('c0000000-0000-0000-0000-000000000004', 'a0000000-0000-0000-0000-000000000001', '0000000a-0000-0000-0000-000000000000', 'WARDROBE',  'Black dress',    'APPROVED',          2, true),
-  ('c0000000-0000-0000-0000-000000000005', 'a0000000-0000-0000-0000-000000000001', '0000000a-0000-0000-0000-000000000000', 'MOODBOARD', 'Private note',   'APPROVED',          3, false),
-  ('c0000000-0000-0000-0000-000000000006', 'a0000000-0000-0000-0000-000000000001', '0000000a-0000-0000-0000-000000000000', 'EQUIPMENT', '85mm lens',      'APPROVED',          1, false);
+-- Board cards: every answer a client can leave, plus cards that must stay out.
+-- Two board images (bytes in R2) for the look's collage and a lens from the kit.
+insert into public.media_files (id, project_id, workspace_id, file_name, content_type, size_bytes, purpose) values
+  ('e0000000-0000-0000-0000-000000000001', 'a0000000-0000-0000-0000-000000000001', '0000000a-0000-0000-0000-000000000000', 'dress.jpg', 'image/jpeg', 100, 'BOARD'),
+  ('e0000000-0000-0000-0000-000000000002', 'a0000000-0000-0000-0000-000000000001', '0000000a-0000-0000-0000-000000000000', 'dress-thumb.jpg', 'image/jpeg', 10, 'BOARD');
+update public.media_files set status = 'READY' where project_id = 'a0000000-0000-0000-0000-000000000001';
+
+insert into public.board_items (id, project_id, workspace_id, kind, group_role, title, status, sort_order, in_shot_list, visibility, technique_note) values
+  ('c0000000-0000-0000-0000-000000000001', 'a0000000-0000-0000-0000-000000000001', '0000000a-0000-0000-0000-000000000000', 'GROUP', 'LOOK', 'Window light',   'APPROVED',          1, true,  'EVERYONE', null),
+  ('c0000000-0000-0000-0000-000000000002', 'a0000000-0000-0000-0000-000000000001', '0000000a-0000-0000-0000-000000000000', 'IMAGE', null,   'Unanswered ref', 'PENDING',           2, true,  'EVERYONE', null),
+  ('c0000000-0000-0000-0000-000000000003', 'a0000000-0000-0000-0000-000000000001', '0000000a-0000-0000-0000-000000000000', 'GROUP', 'LOOK', 'Red coat',       'CHANGES_REQUESTED', 3, true,  'EVERYONE', null),
+  ('c0000000-0000-0000-0000-000000000004', 'a0000000-0000-0000-0000-000000000001', '0000000a-0000-0000-0000-000000000000', 'GROUP', 'LOOK', 'Black dress',    'APPROVED',          4, true,  'EVERYONE', 'f/2, window on the left'),
+  ('c0000000-0000-0000-0000-000000000005', 'a0000000-0000-0000-0000-000000000001', '0000000a-0000-0000-0000-000000000000', 'IMAGE', null,   'Not for the day', 'APPROVED',         5, false, 'EVERYONE', null),
+  ('c0000000-0000-0000-0000-000000000006', 'a0000000-0000-0000-0000-000000000001', '0000000a-0000-0000-0000-000000000000', 'NOTE',  null,   'Bring snacks',   null,                6, true,  'PRIVATE',  null),
+  ('c0000000-0000-0000-0000-000000000009', 'a0000000-0000-0000-0000-000000000001', '0000000a-0000-0000-0000-000000000000', 'IMAGE', null,   'Studio test',    'APPROVED',          9, true,  'PRIVATE',  null);
+
+-- An image inside the Black dress look (part of its collage) and a trashed image.
+insert into public.board_items (id, project_id, workspace_id, kind, parent_id, title, image_key, thumb_key, sort_order) values
+  ('c0000000-0000-0000-0000-000000000007', 'a0000000-0000-0000-0000-000000000001', '0000000a-0000-0000-0000-000000000000', 'IMAGE', 'c0000000-0000-0000-0000-000000000004', 'Dress detail',
+   (select object_key from public.media_files where id = 'e0000000-0000-0000-0000-000000000001'),
+   (select object_key from public.media_files where id = 'e0000000-0000-0000-0000-000000000002'), 1);
+insert into public.board_items (id, project_id, workspace_id, kind, title, status, sort_order, deleted_at) values
+  ('c0000000-0000-0000-0000-000000000008', 'a0000000-0000-0000-0000-000000000001', '0000000a-0000-0000-0000-000000000000', 'IMAGE', 'Trashed', 'APPROVED', 8, now());
+
+insert into public.gear_items (id, workspace_id, kind, name)
+values ('90000000-0000-0000-0000-000000000001', '0000000a-0000-0000-0000-000000000000', 'LENS', '85mm');
+insert into public.board_item_gear (board_item_id, gear_id, project_id, workspace_id)
+values ('c0000000-0000-0000-0000-000000000004', '90000000-0000-0000-0000-000000000001', 'a0000000-0000-0000-0000-000000000001', '0000000a-0000-0000-0000-000000000000');
 
 -- The photographer's own shot that is not tied to a card, and one already added
 -- from a card by hand before the shoot day.
-insert into public.shot_list_items (project_id, workspace_id, concept_item_id, title, sort_order) values
+insert into public.shot_list_items (project_id, workspace_id, board_item_id, title, sort_order) values
   ('a0000000-0000-0000-0000-000000000001', '0000000a-0000-0000-0000-000000000000', null, 'Hands close-up', 99),
   ('a0000000-0000-0000-0000-000000000001', '0000000a-0000-0000-0000-000000000000', 'c0000000-0000-0000-0000-000000000001', 'Window light, my framing', 0);
 
@@ -69,37 +89,66 @@ select is(
 );
 
 select set_eq(
-  $$ select concept_item_id from public.shot_list_items where project_id = 'a0000000-0000-0000-0000-000000000001' and concept_item_id is not null $$,
-  $$ values ('c0000000-0000-0000-0000-000000000001'::uuid), ('c0000000-0000-0000-0000-000000000002'::uuid), ('c0000000-0000-0000-0000-000000000004'::uuid) $$,
-  'day-of references are the approved and unanswered moodboard/wardrobe cards only'
+  $$ select board_item_id from public.shot_list_items where project_id = 'a0000000-0000-0000-0000-000000000001' and board_item_id is not null $$,
+  $$ values ('c0000000-0000-0000-0000-000000000001'::uuid), ('c0000000-0000-0000-0000-000000000002'::uuid),
+            ('c0000000-0000-0000-0000-000000000004'::uuid), ('c0000000-0000-0000-0000-000000000009'::uuid) $$,
+  'day-of shots are the approved and unanswered looks and images marked for the shot list'
 );
 
 select is(
-  (select title from public.shot_list_items where concept_item_id = 'c0000000-0000-0000-0000-000000000001'),
+  (select title from public.shot_list_items where board_item_id = 'c0000000-0000-0000-0000-000000000001'),
   'Window light, my framing',
   'a card already in the shot list is not duplicated or overwritten'
 );
 
 select ok(
-  not exists (select 1 from public.shot_list_items where concept_item_id = 'c0000000-0000-0000-0000-000000000003'),
-  'a card marked CHANGES_REQUESTED is not collected'
+  not exists (select 1 from public.shot_list_items where board_item_id = 'c0000000-0000-0000-0000-000000000003'),
+  'a look marked CHANGES_REQUESTED is not collected'
 );
 
 select ok(
-  not exists (select 1 from public.shot_list_items where concept_item_id in ('c0000000-0000-0000-0000-000000000005', 'c0000000-0000-0000-0000-000000000006')),
-  'hidden cards and equipment are not collected'
+  not exists (select 1 from public.shot_list_items where board_item_id in (
+    'c0000000-0000-0000-0000-000000000005', 'c0000000-0000-0000-0000-000000000006',
+    'c0000000-0000-0000-0000-000000000007', 'c0000000-0000-0000-0000-000000000008')),
+  'cards off the shot list, notes, images inside a look and trashed cards are not collected'
 );
 
 select is(
-  (select count(*)::integer from public.shot_list_items where project_id = 'a0000000-0000-0000-0000-000000000001' and concept_item_id is null),
+  (select count(*)::integer from public.shot_list_items where project_id = 'a0000000-0000-0000-0000-000000000001' and board_item_id is null),
   1,
   'the photographer''s own shot is kept'
 );
 
 select is(
-  (select title from public.shot_list_items where concept_item_id = 'c0000000-0000-0000-0000-000000000004'),
+  (select title from public.shot_list_items where board_item_id = 'c0000000-0000-0000-0000-000000000004'),
   'Black dress',
-  'collected references copy the card title'
+  'collected shots copy the card title'
+);
+
+select is(
+  (select collage_keys from public.shot_list_items where board_item_id = 'c0000000-0000-0000-0000-000000000004'),
+  array[(select object_key from public.media_files where id = 'e0000000-0000-0000-0000-000000000002')],
+  'a look becomes one shot with a collage of its image thumbnails'
+);
+
+select is(
+  (select technique_note from public.shot_list_items where board_item_id = 'c0000000-0000-0000-0000-000000000004'),
+  'f/2, window on the left',
+  'the technique note comes along'
+);
+
+select is(
+  (select g.gear_id from public.shot_list_item_gear g
+   join public.shot_list_items s on s.id = g.shot_list_item_id
+   where s.board_item_id = 'c0000000-0000-0000-0000-000000000004'),
+  '90000000-0000-0000-0000-000000000001'::uuid,
+  'the look''s lens comes along'
+);
+
+select is(
+  (select visibility from public.shot_list_items where board_item_id = 'c0000000-0000-0000-0000-000000000009'),
+  'PRIVATE'::public.board_visibility,
+  'a private card stays private in the shot list'
 );
 
 select ok(

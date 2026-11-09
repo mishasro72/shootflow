@@ -62,13 +62,23 @@ insert into public.projects (
 insert into public.project_clients (project_id, workspace_id, name, email)
 values ('33333333-3333-3333-3333-333333333333', '22222222-2222-2222-2222-222222222222', 'Anna', 'anna@example.test');
 
-insert into public.concept_items (project_id, workspace_id, category, title, description, status, sort_order) values
-  ('33333333-3333-3333-3333-333333333333', '22222222-2222-2222-2222-222222222222', 'MOODBOARD', 'Backlit field', 'Sun behind the model, soft flare.', 'APPROVED', 1),
-  ('33333333-3333-3333-3333-333333333333', '22222222-2222-2222-2222-222222222222', 'MOODBOARD', 'Walking shot', 'Candid movement through the grass.', 'PENDING', 2),
-  ('33333333-3333-3333-3333-333333333333', '22222222-2222-2222-2222-222222222222', 'WARDROBE', 'White linen dress', 'Plus gold jewelry.', 'APPROVED', 1),
-  ('33333333-3333-3333-3333-333333333333', '22222222-2222-2222-2222-222222222222', 'WARDROBE', 'Red coat', null, 'CHANGES_REQUESTED', 2),
-  ('33333333-3333-3333-3333-333333333333', '22222222-2222-2222-2222-222222222222', 'EQUIPMENT', '85mm f/1.4', null, 'PENDING', 1),
-  ('33333333-3333-3333-3333-333333333333', '22222222-2222-2222-2222-222222222222', 'EQUIPMENT', 'Reflector', null, 'PENDING', 2);
+-- A small board: a look with a note inside, a section, a palette and a private note.
+insert into public.board_items (id, project_id, workspace_id, kind, group_role, group_color, title, body, sort_order, technique_note) values
+  ('44444444-4444-4444-4444-444444444401', '33333333-3333-3333-3333-333333333333', '22222222-2222-2222-2222-222222222222', 'GROUP', 'LOOK', '#e8dcc8', 'White linen dress', 'Plus gold jewelry.', 1, '85mm, f/2, backlight'),
+  ('44444444-4444-4444-4444-444444444402', '33333333-3333-3333-3333-333333333333', '22222222-2222-2222-2222-222222222222', 'GROUP', 'SECTION', null, 'Poses', null, 2, null);
+insert into public.board_items (project_id, workspace_id, kind, parent_id, title, body, payload, sort_order, visibility) values
+  ('33333333-3333-3333-3333-333333333333', '22222222-2222-2222-2222-222222222222', 'NOTE', '44444444-4444-4444-4444-444444444401', 'Hair', 'Loose waves, no hairspray.', '{}', 1, 'EVERYONE'),
+  ('33333333-3333-3333-3333-333333333333', '22222222-2222-2222-2222-222222222222', 'NOTE', '44444444-4444-4444-4444-444444444402', 'Walking shot', 'Candid movement through the grass.', '{}', 1, 'EVERYONE'),
+  ('33333333-3333-3333-3333-333333333333', '22222222-2222-2222-2222-222222222222', 'PALETTE', null, 'Sunset field', null, '{"colors": ["#f2c46d", "#e07a5f", "#81b29a", "#3d405b"]}', 3, 'EVERYONE'),
+  ('33333333-3333-3333-3333-333333333333', '22222222-2222-2222-2222-222222222222', 'NOTE', null, 'Parking', 'Gate code 4512.', '{}', 4, 'PRIVATE');
+
+-- The demo studio's kit; the 85mm is chosen for the look and lands in the packing list.
+insert into public.gear_items (id, workspace_id, kind, name, sort_order) values
+  ('55555555-5555-5555-5555-555555555501', '22222222-2222-2222-2222-222222222222', 'CAMERA', 'Canon R6 Mark II', 1),
+  ('55555555-5555-5555-5555-555555555502', '22222222-2222-2222-2222-222222222222', 'LENS', 'RF 85mm f/1.2', 2),
+  ('55555555-5555-5555-5555-555555555503', '22222222-2222-2222-2222-222222222222', 'MODIFIER', 'Reflector 5-in-1', 3);
+insert into public.board_item_gear (board_item_id, gear_id, project_id, workspace_id)
+values ('44444444-4444-4444-4444-444444444401', '55555555-5555-5555-5555-555555555502', '33333333-3333-3333-3333-333333333333', '22222222-2222-2222-2222-222222222222');
 
 -- Move the demo project out of DRAFT through the only allowed path.
 select public.transition_project_status('33333333-3333-3333-3333-333333333333', 'PLANNING');

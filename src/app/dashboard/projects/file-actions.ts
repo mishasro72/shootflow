@@ -16,11 +16,13 @@ const fileId = z.uuid();
 export async function deleteProjectFile(id: string): Promise<void> {
   if (!fileId.safeParse(id).success) return;
 
+  // Only the private Files folder: board images are released by the board itself.
   const supabase = await createSupabaseServerClient();
   const { data: file } = await supabase
     .from("media_files")
     .select("id, project_id, object_key")
     .eq("id", id)
+    .eq("purpose", "FILE")
     .maybeSingle();
   if (!file) return;
 
