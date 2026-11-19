@@ -13,7 +13,6 @@ import { restoreBoardCard } from "../actions";
 
 type Props = { params: Promise<{ id: string }> };
 
-
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("Board");
   return { title: t("trashTitle") };

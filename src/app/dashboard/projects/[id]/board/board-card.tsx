@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { MAX_PALETTE_COLORS, paletteColors } from "@/lib/board/schemas";
-import type { BoardItem } from "@/lib/board/tree";
+import type { BoardItem, BoardKind, GroupRole } from "@/lib/board/tree";
 import { cn } from "@/lib/utils";
 
 import { useBoard } from "./board-feed";
@@ -58,7 +58,8 @@ export function BoardCard({ item, handle, children }: { item: BoardItem; handle:
   );
 }
 
-function kindKey(item: BoardItem): string {
+/** The label key of a card: groups are named by their role (Look or Section). */
+function kindKey(item: BoardItem): Exclude<BoardKind, "GROUP"> | GroupRole {
   return item.kind === "GROUP" ? (item.group_role ?? "SECTION") : item.kind;
 }
 
