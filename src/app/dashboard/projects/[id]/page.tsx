@@ -35,6 +35,7 @@ import { getProject } from "../queries";
 import { ArchiveButton } from "./archive-button";
 import { PinForm } from "./pin-form";
 import { ProjectFiles } from "./project-files";
+import { ProjectTabs } from "./project-tabs";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -113,6 +114,8 @@ export default async function ProjectPage({ params }: Props) {
           {!project.archived_at && <ArchiveButton action={archiveProject.bind(null, project.id)} />}
         </div>
       </div>
+
+      <ProjectTabs projectId={project.id} />
 
       <div className="grid gap-3 sm:grid-cols-2">
         <InfoCard icon={CalendarDays} title={t("when")} testId="project-when">

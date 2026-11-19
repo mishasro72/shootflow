@@ -202,7 +202,10 @@
     "pinInvalid": "Use exactly 4 digits.",
     "pinSaved": "PIN saved. Send it to your client separately from the link.",
     "pinError": "Could not save the PIN. Please try again.",
-    "secretsOff": "New links and PINs need the Supabase secret key on the server (SUPABASE_SECRET_KEY)."
+    "secretsOff": "New links and PINs need the Supabase secret key on the server (SUPABASE_SECRET_KEY).",
+    "tabsLabel": "Project sections",
+    "tabOverview": "Overview",
+    "tabBoard": "Board"
   },
   "Calendar": {
     "summaryWithClient": "{title} · {client}",
@@ -212,7 +215,6 @@
     "mapLink": "Map: {url}",
     "feedName": "ShootFlow · {studio}"
   },
-
   "Uploader": {
     "drop": "Drop photos or PDF files here, or click to choose",
     "hint": "Images and PDF, up to 100 MB each.",
@@ -241,5 +243,66 @@
     "deleteYes": "Yes, delete",
     "deleteNo": "Cancel",
     "disabled": "File uploads need Cloudflare R2 and the Supabase secret key on the server."
+  },
+  "Board": {
+    "title": "Board",
+    "lead": "Looks, references, palettes and notes for the shoot. The order here is the order your client sees.",
+    "empty": "The board is empty. Start with a look or a note.",
+    "emptyGroup": "Nothing here yet.",
+    "add": "Add",
+    "addInside": "Add here",
+    "kinds": {
+      "LOOK": "Look",
+      "SECTION": "Section",
+      "IMAGE": "Photo",
+      "NOTE": "Note",
+      "PALETTE": "Palette",
+      "LINK": "Link",
+      "LOCATION": "Location"
+    },
+    "status": {
+      "PENDING": "Awaiting reply",
+      "APPROVED": "Approved",
+      "CHANGES_REQUESTED": "Needs a change"
+    },
+    "visibilityTitle": "Who can see it",
+    "visibility": {
+      "EVERYONE": "Everyone",
+      "TEAM": "Team only",
+      "PRIVATE": "Only me"
+    },
+    "inShotList": "In shot list",
+    "notInShotList": "Not in shot list",
+    "menu": "Actions: {title}",
+    "edit": "Edit",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "moveTo": "Move to",
+    "moveToTop": "Top level",
+    "trash": "Move to trash",
+    "dragHandle": "Drag: {title}",
+    "untitled": "Untitled",
+    "titleLabel": "Title",
+    "bodyLabel": "Text",
+    "colorsLabel": "Colours",
+    "colorN": "Colour {n}",
+    "removeColor": "Remove colour {n}",
+    "addColor": "Add colour",
+    "groupColor": "Label colour",
+    "noColor": "None",
+    "save": "Save",
+    "cancel": "Cancel",
+    "errors": {
+      "invalid": "That is not possible: for example, a group cannot go inside a look.",
+      "failed": "Could not save. Please try again."
+    },
+    "trashLink": "Trash ({count})",
+    "trashTitle": "Board trash",
+    "trashLead": "Deleted cards are kept for {days} days, then removed for good.",
+    "trashEmpty": "The trash is empty.",
+    "trashInside": "{count, plural, one {# card inside} other {# cards inside}}",
+    "daysLeft": "{days, plural, =0 {removed today} one {# day left} other {# days left}}",
+    "restore": "Restore",
+    "backToBoard": "Back to board"
   }
 }
