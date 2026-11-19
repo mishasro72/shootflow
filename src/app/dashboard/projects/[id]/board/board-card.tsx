@@ -14,13 +14,12 @@ import { cn } from "@/lib/utils";
 
 import { useBoard } from "./board-feed";
 import { CardMenu } from "./card-menu";
-import { DragHandle } from "./sortable-list";
 
 /** Colours a group can be marked with (the left edge of the card). */
 const GROUP_COLORS = ["#e8dcc8", "#f2c46d", "#e07a5f", "#81b29a", "#7aa5d2", "#b392ac"];
 
 /** One card of the feed: its content, or its editor when it is being edited. */
-export function BoardCard({ item, children }: { item: BoardItem; children?: ReactNode }) {
+export function BoardCard({ item, handle, children }: { item: BoardItem; handle: ReactNode; children?: ReactNode }) {
   const t = useTranslations("Board");
   const { editingId } = useBoard();
   const isGroup = item.kind === "GROUP";
@@ -33,7 +32,7 @@ export function BoardCard({ item, children }: { item: BoardItem; children?: Reac
       style={isGroup && item.group_color ? { borderLeftColor: item.group_color } : undefined}
     >
       <header className="flex items-center gap-1">
-        <DragHandle label={t("dragHandle", { title })} />
+        {handle}
         <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-1">
           <span className="text-xs text-muted-foreground">{t(`kinds.${kindKey(item)}`)}</span>
           {item.status && (

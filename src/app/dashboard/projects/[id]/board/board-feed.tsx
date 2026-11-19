@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { createContext, useContext, useEffect, useMemo, useState, useTransition } from "react";
+import { createContext, useContext, useMemo, useState, useTransition } from "react";
 
 import type { NewCardKind, UpdateCardInput } from "@/lib/board/schemas";
 import { buildFeed, moveBy, siblingIds, type BoardItem, type FeedNode } from "@/lib/board/tree";
@@ -58,8 +58,13 @@ export function BoardFeed({ projectId, items }: { projectId: string; items: Boar
   const [error, setError] = useState<"invalid" | "failed" | null>(null);
   const [pending, startTransition] = useTransition();
 
-  // A fresh board from the server replaces the local copy.
-  useEffect(() => setLocal(items), [items]);
+  // A fresh board from the server replaces the local copy. Comparing with the previous
+  // props during render (instead of in an effect) avoids an extra render with stale cards.
+  const [serverItems, setServerItems] = useState(items);
+  if (items !== serverItems) {
+    setServerItems(items);
+    setLocal(items);
+  }
 
   const feed = useMemo(() => buildFeed(local), [local]);
 
@@ -128,10 +133,17 @@ export function BoardFeed({ projectId, items }: { projectId: string; items: Boar
         ) : (
           <SortableList ids={feed.map((node) => node.id)} onReorder={(ids) => api.reorder(null, ids)}>
             {feed.map((node) => (
-              <SortableItem key={node.id} id={node.id} testId="board-card">
-                <BoardCard item={node}>
-                  {node.kind === "GROUP" && <GroupChildren group={node} />}
-                </BoardCard>
+              <SortableItem
+                key={node.id}
+                id={node.id}
+                testId="board-card"
+                handleLabel={t("dragHandle", { title: node.title || t("untitled") })}
+              >
+                {(handle) => (
+                  <BoardCard item={node} handle={handle}>
+                    {node.kind === "GROUP" && <GroupChildren group={node} />}
+                  </BoardCard>
+                )}
               </SortableItem>
             ))}
           </SortableList>
@@ -154,8 +166,17 @@ function GroupChildren({ group }: { group: FeedNode }) {
       ) : (
         <SortableList ids={group.children.map((child) => child.id)} onReorder={(ids) => reorder(group.id, ids)}>
           {group.children.map((child) => (
-            <SortableItem key={child.id} id={child.id} testId="board-card">
-              <BoardCard item={child}>{child.kind === "GROUP" && <GroupChildren group={child} />}</BoardCard>
+            <SortableItem
+              key={child.id}
+              id={child.id}
+              testId="board-card"
+              handleLabel={t("dragHandle", { title: child.title || t("untitled") })}
+            >
+              {(handle) => (
+                <BoardCard item={child} handle={handle}>
+                  {child.kind === "GROUP" && <GroupChildren group={child} />}
+                </BoardCard>
+              )}
             </SortableItem>
           ))}
         </SortableList>

@@ -18,7 +18,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical } from "lucide-react";
-import { createContext, useContext, useMemo, type ReactNode } from "react";
+import type { ReactNode } from "react";
 
 import { moveTo } from "@/lib/board/tree";
 import { cn } from "@/lib/utils";
@@ -61,18 +61,39 @@ export function SortableList({ ids, onReorder, children }: Props) {
   );
 }
 
-type Handle = Pick<ReturnType<typeof useSortable>, "setActivatorNodeRef" | "attributes" | "listeners">;
-
-const HandleContext = createContext<Handle | null>(null);
-
-/** One item of a SortableList. Put a <DragHandle> somewhere inside it. */
-export function SortableItem({ id, children, testId }: { id: string; children: ReactNode; testId?: string }) {
+/**
+ * One item of a SortableList. It makes the drag handle and gives it to `children`, which
+ * puts it where it belongs in the card.
+ */
+export function SortableItem({
+  id,
+  handleLabel,
+  testId,
+  children,
+}: {
+  id: string;
+  handleLabel: string;
+  testId?: string;
+  children: (handle: ReactNode) => ReactNode;
+}) {
   // Only plain values and callbacks are taken out: the hook's result also holds the DOM
   // node itself, which must not be read while rendering.
   const { setNodeRef, setActivatorNodeRef, attributes, listeners, transform, transition, isDragging } = useSortable({
     id,
   });
-  const handle = useMemo(() => ({ setActivatorNodeRef, attributes, listeners }), [setActivatorNodeRef, attributes, listeners]);
+
+  const handle = (
+    <button
+      type="button"
+      ref={setActivatorNodeRef}
+      aria-label={handleLabel}
+      className="flex size-8 shrink-0 cursor-grab touch-none items-center justify-center rounded-md text-muted-foreground hover:bg-accent focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none active:cursor-grabbing"
+      {...attributes}
+      {...listeners}
+    >
+      <GripVertical className="size-4" aria-hidden />
+    </button>
+  );
 
   return (
     <li
@@ -81,24 +102,7 @@ export function SortableItem({ id, children, testId }: { id: string; children: R
       style={{ transform: CSS.Transform.toString(transform), transition }}
       className={cn("min-w-0", isDragging && "relative z-10 opacity-80")}
     >
-      <HandleContext.Provider value={handle}>{children}</HandleContext.Provider>
+      {children(handle)}
     </li>
-  );
-}
-
-export function DragHandle({ label }: { label: string }) {
-  const handle = useContext(HandleContext);
-  if (!handle) return null;
-  return (
-    <button
-      type="button"
-      ref={handle.setActivatorNodeRef}
-      aria-label={label}
-      className="flex size-8 shrink-0 cursor-grab touch-none items-center justify-center rounded-md text-muted-foreground hover:bg-accent focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none active:cursor-grabbing"
-      {...handle.attributes}
-      {...handle.listeners}
-    >
-      <GripVertical className="size-4" aria-hidden />
-    </button>
   );
 }
