@@ -5,6 +5,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
+import { TRASH_DAYS, trashDaysLeft } from "@/lib/board/trash";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 import { getProject } from "../../../queries";
@@ -12,9 +13,6 @@ import { restoreBoardCard } from "../actions";
 
 type Props = { params: Promise<{ id: string }> };
 
-/** Cards stay in the trash this long; a nightly job removes them afterwards. */
-const TRASH_DAYS = 30;
-const DAY_MS = 24 * 60 * 60 * 1000;
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("Board");
@@ -43,7 +41,6 @@ export default async function BoardTrashPage({ params }: Props) {
   const trashedIds = new Set(items.map((item) => item.id));
   // A card trashed with its group comes back with the group, so only the group is offered.
   const roots = items.filter((item) => !(item.parent_id && trashedIds.has(item.parent_id)));
-  const now = Date.now();
 
   return (
     <div className="flex max-w-3xl flex-col gap-6">
@@ -65,8 +62,7 @@ export default async function BoardTrashPage({ params }: Props) {
       ) : (
         <ul className="flex flex-col gap-2">
           {roots.map((item) => {
-            const deletedAt = new Date(item.deleted_at ?? now).getTime();
-            const daysLeft = Math.max(TRASH_DAYS - Math.floor((now - deletedAt) / DAY_MS), 0);
+            const daysLeft = item.deleted_at ? trashDaysLeft(item.deleted_at) : TRASH_DAYS;
             const inside = items.filter((child) => child.parent_id === item.id).length;
             const kind = item.kind === "GROUP" ? (item.group_role ?? "SECTION") : item.kind;
             return (
