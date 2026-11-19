@@ -23,6 +23,7 @@ export async function ProjectFiles({ projectId }: { projectId: string }) {
     .from("media_files")
     .select("id, object_key, file_name, content_type, size_bytes")
     .eq("project_id", projectId)
+    .eq("purpose", "FILE")
     .eq("status", "READY")
     .order("created_at", { ascending: false });
 
