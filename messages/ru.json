@@ -202,7 +202,10 @@
     "pinInvalid": "Нужно ровно 4 цифры.",
     "pinSaved": "PIN сохранён. Отправьте его клиенту отдельно от ссылки.",
     "pinError": "Не удалось сохранить PIN. Попробуйте ещё раз.",
-    "secretsOff": "Для новых ссылок и PIN на сервере нужен секретный ключ Supabase (SUPABASE_SECRET_KEY)."
+    "secretsOff": "Для новых ссылок и PIN на сервере нужен секретный ключ Supabase (SUPABASE_SECRET_KEY).",
+    "tabsLabel": "Разделы проекта",
+    "tabOverview": "Обзор",
+    "tabBoard": "Доска"
   },
   "Calendar": {
     "summaryWithClient": "{title} · {client}",
@@ -240,5 +243,66 @@
     "deleteYes": "Да, удалить",
     "deleteNo": "Отмена",
     "disabled": "Для загрузки файлов на сервере нужны Cloudflare R2 и секретный ключ Supabase."
+  },
+  "Board": {
+    "title": "Доска",
+    "lead": "Образы, референсы, палитры и заметки к съёмке. Клиент увидит карточки в этом же порядке, кроме скрытых.",
+    "empty": "На доске пока ничего нет. Начните с образа или заметки.",
+    "emptyGroup": "Пока пусто.",
+    "add": "Добавить",
+    "addInside": "Добавить сюда",
+    "kinds": {
+      "LOOK": "Образ",
+      "SECTION": "Раздел",
+      "IMAGE": "Фото",
+      "NOTE": "Заметка",
+      "PALETTE": "Палитра",
+      "LINK": "Ссылка",
+      "LOCATION": "Локация"
+    },
+    "status": {
+      "PENDING": "Ждёт ответа",
+      "APPROVED": "Одобрено",
+      "CHANGES_REQUESTED": "Нужна замена"
+    },
+    "visibilityTitle": "Кто видит",
+    "visibility": {
+      "EVERYONE": "Все",
+      "TEAM": "Только команда",
+      "PRIVATE": "Только я"
+    },
+    "inShotList": "В шот-лист",
+    "notInShotList": "Не в шот-листе",
+    "menu": "Действия: {title}",
+    "edit": "Изменить",
+    "moveUp": "Выше",
+    "moveDown": "Ниже",
+    "moveTo": "Переместить",
+    "moveToTop": "На верхний уровень",
+    "trash": "В корзину",
+    "dragHandle": "Перетащить: {title}",
+    "untitled": "Без названия",
+    "titleLabel": "Название",
+    "bodyLabel": "Текст",
+    "colorsLabel": "Цвета",
+    "colorN": "Цвет {n}",
+    "removeColor": "Убрать цвет {n}",
+    "addColor": "Добавить цвет",
+    "groupColor": "Цвет метки",
+    "noColor": "Нет",
+    "save": "Сохранить",
+    "cancel": "Отмена",
+    "errors": {
+      "invalid": "Так сделать нельзя: например, группу нельзя положить в образ.",
+      "failed": "Не удалось сохранить. Попробуйте ещё раз."
+    },
+    "trashLink": "Корзина ({count})",
+    "trashTitle": "Корзина доски",
+    "trashLead": "Удалённые карточки хранятся {days} дней, потом исчезают насовсем.",
+    "trashEmpty": "Корзина пуста.",
+    "trashInside": "{count, plural, one {внутри # карточка} few {внутри # карточки} many {внутри # карточек} other {внутри # карточки}}",
+    "daysLeft": "{days, plural, =0 {удалится сегодня} one {осталось # день} few {осталось # дня} many {осталось # дней} other {осталось # дня}}",
+    "restore": "Вернуть",
+    "backToBoard": "К доске"
   }
 }
