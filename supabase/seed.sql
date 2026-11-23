@@ -59,6 +59,9 @@ insert into public.projects (
   10
 );
 
+insert into public.project_clients (project_id, workspace_id, name, email)
+values ('33333333-3333-3333-3333-333333333333', '22222222-2222-2222-2222-222222222222', 'Anna', 'anna@example.test');
+
 -- A small board: a look with a note inside, a section, a palette and a private note.
 insert into public.board_items (id, project_id, workspace_id, kind, group_role, group_color, title, body, sort_order, technique_note) values
   ('44444444-4444-4444-4444-444444444401', '33333333-3333-3333-3333-333333333333', '22222222-2222-2222-2222-222222222222', 'GROUP', 'LOOK', '#e8dcc8', 'White linen dress', 'Plus gold jewelry.', 1, '85mm, f/2, backlight'),
