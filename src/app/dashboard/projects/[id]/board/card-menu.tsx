@@ -10,7 +10,7 @@ import {
   Pencil,
   Trash2,
 } from "lucide-react";
-import { imageMeta } from "@/lib/board/schemas";
+import { imageMeta, linkMeta } from "@/lib/board/schemas";
 import { siblingIds, targetGroups, type BoardItem } from "@/lib/board/tree";
 import { useTranslations } from "next-intl";
 
@@ -34,7 +34,7 @@ const VISIBILITIES = ["EVERYONE", "TEAM", "PRIVATE"] as const;
 /**
  * Everything one can do with a card: edit, move up or down, move into a group or out of
  * it, choose who sees it, keep it out of the shot list, send it to the trash. A photo
- * can also give its colours to a new palette card.
+ * (or a link's picture) can also give its colours to a new palette card.
  */
 export function CardMenu({ item }: { item: BoardItem }) {
   const t = useTranslations("Board");
@@ -43,7 +43,8 @@ export function CardMenu({ item }: { item: BoardItem }) {
   const list = siblingIds(board.feed, item.parent_id);
   const index = list.indexOf(item.id);
   const groups = targetGroups(board.feed, item);
-  const hasPalette = item.kind === "IMAGE" && (imageMeta(item.payload)?.palette.length ?? 0) > 0;
+  const colors = item.kind === "IMAGE" ? imageMeta(item.payload)?.palette : linkMeta(item.payload)?.palette;
+  const hasPalette = (item.kind === "IMAGE" || item.kind === "LINK") && (colors?.length ?? 0) > 0;
 
   return (
     <DropdownMenu>

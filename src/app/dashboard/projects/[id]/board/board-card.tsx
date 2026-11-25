@@ -1,8 +1,9 @@
 "use client";
 
 import { Camera, CameraOff, ExternalLink, ImageOff, Lock, MapPin, Users } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 
 import { PlaceSearch } from "@/components/places/place-search";
 import { Button } from "@/components/ui/button";
@@ -11,10 +12,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { imageMeta, linkMeta, MAX_PALETTE_COLORS, paletteColors, placeMeta } from "@/lib/board/schemas";
 import type { BoardItem, BoardKind, GroupRole } from "@/lib/board/tree";
+import { measureImage } from "@/lib/images/prepare";
 import { addressMapUrl, googleMapsUrl } from "@/lib/places/policy";
 import type { PickedPlace } from "@/lib/places/types";
 import { cn } from "@/lib/utils";
 
+import { saveLinkLook } from "./actions";
 import { useBoard } from "./board-feed";
 import { CardMenu } from "./card-menu";
 import { ShadowDial } from "./shadow-dial";
@@ -168,6 +171,7 @@ function Photo({ item, title }: { item: BoardItem; title: string }) {
 function LinkPreview({ item }: { item: BoardItem }) {
   const t = useTranslations("Board");
   const meta = linkMeta(item.payload);
+  useLinkLook(item, meta);
   if (!meta) return <p className="text-muted-foreground">{t("linkEmpty")}</p>;
   return (
     <a
@@ -181,8 +185,17 @@ function LinkPreview({ item }: { item: BoardItem }) {
     >
       {item.thumb_url && (
         // A signed, expiring URL: next/image would cache it longer than it lives.
+        // The picture keeps its own proportions, like a photo: a tall pin is not cropped.
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={item.thumb_url} alt="" loading="lazy" className="aspect-[1.91/1] w-full bg-muted object-cover" />
+        <img
+          src={item.thumb_url}
+          alt=""
+          width={meta.width ?? undefined}
+          height={meta.height ?? undefined}
+          loading="lazy"
+          decoding="async"
+          className="h-auto max-h-[70vh] w-full bg-muted object-contain"
+        />
       )}
       <span className="flex flex-col gap-0.5 px-3 py-2">
         <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -193,6 +206,36 @@ function LinkPreview({ item }: { item: BoardItem }) {
       </span>
     </a>
   );
+}
+
+/**
+ * Measures a link's stored picture once, in the browser: its size (to show it whole) and
+ * its colours (for "Palette from photo"). The server stores the picture but does not
+ * decode images. Runs again on a later visit if it failed (the picture did not load).
+ */
+function useLinkLook(item: BoardItem, meta: ReturnType<typeof linkMeta>) {
+  const router = useRouter();
+  // The picture last measured: a new address brings a new picture to measure.
+  const measured = useRef<string | null>(null);
+  const url = item.thumb_url;
+  const needed = Boolean(meta && url && meta.palette === null);
+
+  useEffect(() => {
+    if (!needed || !url || measured.current === url) return;
+    measured.current = url;
+    (async () => {
+      try {
+        // no-store: an <img> may have cached the picture without CORS headers (see 7a-2b-1).
+        const response = await fetch(url, { cache: "no-store" });
+        if (!response.ok) return;
+        const look = await measureImage(await response.blob());
+        const result = await saveLinkLook({ id: item.id, ...look });
+        if (result.ok) router.refresh();
+      } catch {
+        // Not worth bothering the photographer: the card works without its colours.
+      }
+    })();
+  }, [needed, url, item.id, router]);
 }
 
 /**

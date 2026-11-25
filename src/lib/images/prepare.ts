@@ -81,3 +81,22 @@ export async function prepareBoardImage(file: Blob): Promise<PreparedImage> {
     bitmap.close();
   }
 }
+
+export type ImageLook = { width: number; height: number; palette: string[] };
+
+/**
+ * The size and main colours of a picture we already store (a link's preview), measured
+ * on a 400 px copy, the same way as for a photo the photographer adds.
+ */
+export async function measureImage(file: Blob): Promise<ImageLook> {
+  const bitmap = await decode(file);
+  try {
+    if (bitmap.width === 0 || bitmap.height === 0) throw new ImageDecodeError("empty");
+    const size = fitWithin(bitmap.width, bitmap.height, BOARD_THUMB_PX);
+    const { context } = draw(bitmap, size.width, size.height);
+    const pixels = context.getImageData(0, 0, size.width, size.height).data;
+    return { width: bitmap.width, height: bitmap.height, palette: extractPalette(pixels, 5) };
+  } finally {
+    bitmap.close();
+  }
+}

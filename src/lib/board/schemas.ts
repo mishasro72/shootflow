@@ -135,14 +135,37 @@ export function titleFromFileName(name: string): string {
     .slice(0, 200);
 }
 
-/** What a link card keeps in its payload. */
-export type LinkMeta = { url: string; site: string; description: string | null };
+/**
+ * What a link card keeps in its payload. The picture's size and colours are measured by
+ * the browser after the server stored it (the server does not decode images), so they
+ * are null until then.
+ */
+export type LinkMeta = {
+  url: string;
+  site: string;
+  description: string | null;
+  width: number | null;
+  height: number | null;
+  palette: string[] | null;
+};
 
 const linkMetaSchema = z.object({
   url: z.string(),
   site: z.string(),
   description: z.string().nullable().catch(null),
+  width: z.number().int().positive().nullable().catch(null),
+  height: z.number().int().positive().nullable().catch(null),
+  palette: z.array(hexColorSchema).max(MAX_PALETTE_COLORS).nullable().catch(null),
 });
+
+/** What the browser measured in a link's stored picture: its size and main colours. */
+export const linkLookSchema = z.object({
+  id: z.uuid(),
+  width: z.number().int().positive().max(100_000),
+  height: z.number().int().positive().max(100_000),
+  palette: z.array(hexColorSchema).max(MAX_PALETTE_COLORS),
+});
+export type LinkLookInput = z.input<typeof linkLookSchema>;
 
 /** Reads a link card's payload; null until an address has been saved. */
 export function linkMeta(payload: unknown): LinkMeta | null {

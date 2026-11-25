@@ -10,6 +10,7 @@ import {
   imageCardSchema,
   imageMeta,
   linkCardSchema,
+  linkLookSchema,
   linkMeta,
   locationCardSchema,
   reorderSchema,
@@ -17,6 +18,7 @@ import {
   visibilitySchema,
   type ImageCardInput,
   type LinkCardInput,
+  type LinkLookInput,
   type LocationCardInput,
   type UpdateCardInput,
 } from "@/lib/board/schemas";
@@ -163,7 +165,10 @@ export async function createImageCard(input: ImageCardInput): Promise<BoardActio
   return { ok: true, id: data.id };
 }
 
-/** A palette card with the colours found in a photo, placed right after the photo. */
+/**
+ * A palette card with the colours found in a photo (or in a link's picture), placed
+ * right after that card.
+ */
 export async function createPaletteFromImage(id: string): Promise<BoardActionResult> {
   const parsedId = idSchema.safeParse(id);
   if (!parsedId.success) return INVALID;
@@ -171,12 +176,13 @@ export async function createPaletteFromImage(id: string): Promise<BoardActionRes
   const supabase = await createSupabaseServerClient();
   const { data: image } = await supabase
     .from("board_items")
-    .select("id, project_id, workspace_id, parent_id, title, payload")
+    .select("id, project_id, workspace_id, parent_id, kind, title, payload")
     .eq("id", parsedId.data)
-    .eq("kind", "IMAGE")
+    .in("kind", ["IMAGE", "LINK"])
     .is("deleted_at", null)
     .maybeSingle();
-  const colors = imageMeta(image?.payload)?.palette ?? [];
+  const colors =
+    (image?.kind === "LINK" ? linkMeta(image.payload)?.palette : imageMeta(image?.payload)?.palette) ?? [];
   if (!image || colors.length === 0) return INVALID;
 
   const t = await getTranslations("Board");
@@ -218,6 +224,39 @@ export async function createPaletteFromImage(id: string): Promise<BoardActionRes
 
   refresh(image.project_id);
   return { ok: true, id: palette.id };
+}
+
+/**
+ * Keeps what the browser measured in a link's stored picture (size and colours), so the
+ * card can show the picture whole and offer "Palette from photo". Only for a link card
+ * that has a stored picture; the colours are plain hex values checked by the schema.
+ */
+export async function saveLinkLook(input: LinkLookInput): Promise<BoardActionResult> {
+  const parsed = linkLookSchema.safeParse(input);
+  if (!parsed.success) return INVALID;
+  const { id, width, height, palette } = parsed.data;
+
+  const supabase = await createSupabaseServerClient();
+  const { data: card } = await supabase
+    .from("board_items")
+    .select("id, project_id, payload, thumb_key")
+    .eq("id", id)
+    .eq("kind", "LINK")
+    .is("deleted_at", null)
+    .maybeSingle();
+  const meta = linkMeta(card?.payload);
+  if (!card || !meta || !card.thumb_key) return INVALID;
+
+  const { error } = await supabase
+    .from("board_items")
+    .update({ payload: { ...meta, width, height, palette } })
+    .eq("id", card.id)
+    // Only if the address did not change meanwhile (a new address brings a new picture).
+    .eq("payload->>url", meta.url);
+  if (error) return FAILED;
+
+  refresh(card.project_id);
+  return { ok: true, id: card.id };
 }
 
 /** Saves the title and text of a card, and the colours of a palette or a group. */

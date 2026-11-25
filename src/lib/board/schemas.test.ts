@@ -3,6 +3,7 @@ import {
   hexColorSchema,
   imageCardSchema,
   imageMeta,
+  linkLookSchema,
   linkMeta,
   locationCardSchema,
   paletteColors,
@@ -78,8 +79,32 @@ describe("board schemas", () => {
       url: "https://a.com/",
       site: "a.com",
       description: null,
+      width: null,
+      height: null,
+      palette: null,
     });
     expect(linkMeta({})).toBeNull();
+  });
+
+  it("reads what the browser measured in a link's picture, and drops bad values", () => {
+    const base = { url: "https://a.com/", site: "a.com", description: null };
+    expect(linkMeta({ ...base, width: 1000, height: 1500, palette: ["#aabbcc"] })).toMatchObject({
+      width: 1000,
+      height: 1500,
+      palette: ["#aabbcc"],
+    });
+    // Measured but with no colours is not the same as not measured yet.
+    expect(linkMeta({ ...base, palette: [] })?.palette).toEqual([]);
+    expect(linkMeta({ ...base, width: -1, palette: ["red"] })).toMatchObject({ width: null, palette: null });
+  });
+
+  it("accepts a measured look only with sane numbers and hex colours", () => {
+    const id = "6f1d8c2e-4b7a-4c1e-9f2d-3a5b6c7d8e9f";
+    expect(linkLookSchema.safeParse({ id, width: 1200, height: 630, palette: ["#112233"] }).success).toBe(true);
+    expect(linkLookSchema.safeParse({ id, width: 1200, height: 630, palette: [] }).success).toBe(true);
+    expect(linkLookSchema.safeParse({ id, width: 0, height: 630, palette: [] }).success).toBe(false);
+    expect(linkLookSchema.safeParse({ id, width: 1200, height: 630, palette: ["url(x)"] }).success).toBe(false);
+    expect(linkLookSchema.safeParse({ id: "x", width: 1200, height: 630, palette: [] }).success).toBe(false);
   });
 
   it("reads a place card's payload, with or without a Google place", () => {
