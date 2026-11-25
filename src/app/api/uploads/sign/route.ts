@@ -7,7 +7,7 @@ import { signRequestSchema, type SignedFile } from "@/lib/storage/upload-rules";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 /**
- * POST /api/uploads/sign  { projectId, files: [{ name, type, size }] }
+ * POST /api/uploads/sign  { projectId, purpose?, files: [{ name, type, size }] }
  *
  * For each file: reserve its size in the studio's quota (a PENDING row; the database
  * refuses when there is no room) and return a short-lived URL to PUT the bytes straight
@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
 
   const parsed = signRequestSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: "bad_request" }, { status: 400 });
-  const { projectId, files } = parsed.data;
+  const { projectId, purpose, files } = parsed.data;
 
   // RLS: another studio's project, or an archived one, is simply not found.
   const supabase = await createSupabaseServerClient();
@@ -43,6 +43,7 @@ export async function POST(request: NextRequest) {
         file_name: file.name,
         content_type: file.type,
         size_bytes: file.size,
+        purpose,
       })
       .select("id, object_key")
       .single();

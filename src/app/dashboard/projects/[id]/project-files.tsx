@@ -10,6 +10,8 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 import { deleteProjectFile } from "../file-actions";
 
+import { ToBoardButton } from "./to-board-button";
+
 /**
  * The project's files: an uploader and the list of finished uploads. Links are signed
  * here, on every page view, and work for 30 minutes; the database stores only keys.
@@ -26,6 +28,18 @@ export async function ProjectFiles({ projectId }: { projectId: string }) {
     .eq("purpose", "FILE")
     .eq("status", "READY")
     .order("created_at", { ascending: false });
+
+  // Files that a live photo card on the board was copied from.
+  const { data: copies } = await supabase
+    .from("board_items")
+    .select("payload")
+    .eq("project_id", projectId)
+    .eq("kind", "IMAGE")
+    .is("deleted_at", null)
+    .not("payload->>source_file_id", "is", null);
+  const onBoard = new Set(
+    (copies ?? []).map((card) => (card.payload as { source_file_id?: string } | null)?.source_file_id),
+  );
 
   const files = enabled
     ? await Promise.all(
@@ -76,6 +90,15 @@ export async function ProjectFiles({ projectId }: { projectId: string }) {
                         <Download className="size-3.5" aria-hidden />
                         {t("download")}
                       </a>
+                      {file.previewUrl && (
+                        <ToBoardButton
+                          projectId={projectId}
+                          fileId={file.id}
+                          url={file.previewUrl}
+                          name={file.file_name}
+                          onBoard={onBoard.has(file.id)}
+                        />
+                      )}
                       <ConfirmButton
                         action={deleteProjectFile.bind(null, file.id)}
                         label={t("delete")}

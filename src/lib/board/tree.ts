@@ -24,6 +24,9 @@ export type BoardItem = {
   visibility: Visibility;
   in_shot_list: boolean;
   created_at: string;
+  /** Photo cards: signed links to the 400 px thumbnail and the 2048 px copy (they expire). */
+  thumb_url?: string | null;
+  image_url?: string | null;
 };
 
 export type FeedNode = BoardItem & { children: FeedNode[] };

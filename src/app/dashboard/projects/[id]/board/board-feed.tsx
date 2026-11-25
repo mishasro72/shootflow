@@ -6,9 +6,12 @@ import { createContext, useContext, useMemo, useState, useTransition } from "rea
 
 import type { NewCardKind, UpdateCardInput } from "@/lib/board/schemas";
 import { buildFeed, moveBy, siblingIds, type BoardItem, type FeedNode } from "@/lib/board/tree";
+import { BoardImageUploadError, uploadBoardImage, type BoardImageError } from "@/lib/board/upload-image";
 
 import {
   createBoardCard,
+  createImageCard,
+  createPaletteFromImage,
   moveBoardCard,
   reorderBoardCards,
   setBoardCardInShotList,
@@ -21,13 +24,19 @@ import { AddMenu } from "./add-menu";
 import { BoardCard } from "./board-card";
 import { SortableItem, SortableList } from "./sortable-list";
 
+type BoardError = "invalid" | "failed" | BoardImageError;
+
 /** Everything a card needs to change the board, shared through context. */
 type BoardApi = {
   feed: FeedNode[];
   pending: boolean;
+  /** Photo uploads work (R2 is configured). */
+  uploads: boolean;
   editingId: string | null;
   setEditingId: (id: string | null) => void;
   add: (kind: NewCardKind, parentId: string | null) => void;
+  addImages: (files: File[], parentId: string | null) => void;
+  paletteFromImage: (item: BoardItem) => void;
   save: (input: UpdateCardInput) => Promise<boolean>;
   reorder: (parentId: string | null, ids: string[]) => void;
   step: (item: BoardItem, by: number) => void;
@@ -50,12 +59,13 @@ export function useBoard(): BoardApi {
  * this component keeps a local copy so drags and arrows move cards at once, then saves.
  * After every save the server sends the board again and the copy is replaced.
  */
-export function BoardFeed({ projectId, items }: { projectId: string; items: BoardItem[] }) {
+export function BoardFeed({ projectId, items, uploads }: { projectId: string; items: BoardItem[]; uploads: boolean }) {
   const t = useTranslations("Board");
   const router = useRouter();
   const [local, setLocal] = useState(items);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [error, setError] = useState<"invalid" | "failed" | null>(null);
+  const [error, setError] = useState<BoardError | null>(null);
+  const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
   const [pending, startTransition] = useTransition();
 
   // A fresh board from the server replaces the local copy. Comparing with the previous
@@ -84,12 +94,43 @@ export function BoardFeed({ projectId, items }: { projectId: string; items: Boar
   /** Writes a new order into the local copy right away. */
   function applyOrder(ids: string[]) {
     const order = new Map(ids.map((id, index) => [id, index + 1]));
-    setLocal((list) => list.map((item) => (order.has(item.id) ? { ...item, sort_order: order.get(item.id) ?? 0 } : item)));
+    setLocal((list) =>
+      list.map((item) => (order.has(item.id) ? { ...item, sort_order: order.get(item.id) ?? 0 } : item)),
+    );
+  }
+
+  /**
+   * Photos one after another (a phone has little memory for big pictures): prepare and
+   * upload each, then create its card. The first problem is shown when all are done.
+   */
+  function addImages(files: File[], parentId: string | null) {
+    if (files.length === 0) return;
+    setError(null);
+    setProgress({ done: 0, total: files.length });
+    startTransition(async () => {
+      let problem: BoardError | null = null;
+      for (const [index, file] of files.entries()) {
+        try {
+          const image = await uploadBoardImage(projectId, file);
+          const result = await createImageCard({ projectId, parentId, ...image });
+          if (!result.ok) problem ??= result.error;
+        } catch (caught) {
+          problem ??= caught instanceof BoardImageUploadError ? caught.reason : "failed";
+        }
+        setProgress({ done: index + 1, total: files.length });
+      }
+      setProgress(null);
+      if (problem) {
+        setError(problem);
+        router.refresh();
+      }
+    });
   }
 
   const api: BoardApi = {
     feed,
     pending,
+    uploads,
     editingId,
     setEditingId,
     add: (kind, parentId) =>
@@ -97,6 +138,8 @@ export function BoardFeed({ projectId, items }: { projectId: string; items: Boar
         () => createBoardCard({ projectId, parentId, kind }),
         (result) => setEditingId(result.id ?? null),
       ),
+    addImages,
+    paletteFromImage: (item) => run(() => createPaletteFromImage(item.id)),
     save: async (input) => {
       setError(null);
       const result = await updateBoardCard(input);
@@ -123,6 +166,12 @@ export function BoardFeed({ projectId, items }: { projectId: string; items: Boar
         {error && (
           <p role="alert" className="rounded-md border border-destructive/40 px-3 py-2 text-sm text-destructive">
             {t(`errors.${error}`)}
+          </p>
+        )}
+
+        {progress && (
+          <p role="status" data-testid="image-progress" className="text-sm text-muted-foreground">
+            {t("imagesUploading", progress)}
           </p>
         )}
 

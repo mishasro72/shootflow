@@ -21,20 +21,34 @@ export function checkFile(file: { size: number; type: string }): FileProblem | n
   return null;
 }
 
+/**
+ * What an upload is for. FILE goes to the private Files folder; BOARD is a copy the
+ * browser made for a board card (2048 px or 400 px JPEG), so only JPEG is accepted.
+ */
+export const uploadPurposeSchema = z.enum(["FILE", "BOARD"]);
+export type UploadPurpose = z.infer<typeof uploadPurposeSchema>;
+export const BOARD_UPLOAD_TYPE = "image/jpeg";
+
 /** POST /api/uploads/sign */
-export const signRequestSchema = z.object({
-  projectId: z.uuid(),
-  files: z
-    .array(
-      z.object({
-        name: z.string().trim().min(1).max(255),
-        type: z.string().regex(ALLOWED_TYPE),
-        size: z.number().int().positive().max(MAX_UPLOAD_BYTES),
-      }),
-    )
-    .min(1)
-    .max(MAX_FILES_PER_SIGN),
-});
+export const signRequestSchema = z
+  .object({
+    projectId: z.uuid(),
+    purpose: uploadPurposeSchema.default("FILE"),
+    files: z
+      .array(
+        z.object({
+          name: z.string().trim().min(1).max(255),
+          type: z.string().regex(ALLOWED_TYPE),
+          size: z.number().int().positive().max(MAX_UPLOAD_BYTES),
+        }),
+      )
+      .min(1)
+      .max(MAX_FILES_PER_SIGN),
+  })
+  .refine((request) => request.purpose !== "BOARD" || request.files.every((file) => file.type === BOARD_UPLOAD_TYPE), {
+    message: "board uploads are JPEG",
+    path: ["files"],
+  });
 
 export type SignRequest = z.infer<typeof signRequestSchema>;
 

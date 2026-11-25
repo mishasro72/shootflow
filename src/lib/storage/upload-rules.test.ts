@@ -37,4 +37,17 @@ describe("signRequestSchema", () => {
     );
     expect(signRequestSchema.safeParse({ projectId, files: Array(21).fill(file) }).success).toBe(false);
   });
+  it("is a Files upload unless the board asks", () => {
+    const file = { name: "a.pdf", type: "application/pdf", size: 10 };
+    const parsed = signRequestSchema.safeParse({ projectId, files: [file] });
+    expect(parsed.success && parsed.data.purpose).toBe("FILE");
+  });
+
+  it("takes only JPEG for the board: the browser has already converted the photo", () => {
+    const jpeg = { name: "look.jpg", type: "image/jpeg", size: 10 };
+    const png = { name: "look.png", type: "image/png", size: 10 };
+    expect(signRequestSchema.safeParse({ projectId, purpose: "BOARD", files: [jpeg, jpeg] }).success).toBe(true);
+    expect(signRequestSchema.safeParse({ projectId, purpose: "BOARD", files: [jpeg, png] }).success).toBe(false);
+    expect(signRequestSchema.safeParse({ projectId, purpose: "OTHER", files: [jpeg] }).success).toBe(false);
+  });
 });
