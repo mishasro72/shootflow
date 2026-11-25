@@ -301,7 +301,8 @@
       "failed": "Не удалось сохранить. Попробуйте ещё раз.",
       "tooLarge": "Фото больше 100 МБ.",
       "decode": "Этот файл не открывается как фото.",
-      "quota": "Не хватает места в хранилище для этого фото."
+      "quota": "Не хватает места в хранилище для этого фото.",
+      "badLink": "Это не похоже на адрес страницы."
     },
     "trashLink": "Корзина ({count})",
     "trashTitle": "Корзина доски",
@@ -315,6 +316,21 @@
     "paletteFromImage": "Палитра из фото",
     "openImage": "Открыть фото: {title}",
     "imageUnavailable": "Фото не показать: хранилище не настроено.",
-    "paletteTitle": "Палитра · {title}"
+    "paletteTitle": "Палитра · {title}",
+    "linkUrl": "Адрес ссылки",
+    "linkEmpty": "Добавьте адрес страницы.",
+    "linkSaving": "Читаем страницу…",
+    "openLink": "Открыть ссылку: {site}",
+    "placeName": "Название места",
+    "placeAddress": "Адрес",
+    "placeOpenMap": "На карте",
+    "placeLinked": "Связано с местом в Google",
+    "placeUnlink": "Отвязать",
+    "placeLightNoDate": "Свет появится, когда у съёмки будет дата.",
+    "placeLightTitle": "Свет · {date}",
+    "placeMorningGolden": "Утренний золотой час",
+    "placeEveningGolden": "Вечерний золотой час",
+    "placeSunrise": "Восход",
+    "placeSunset": "Закат"
   }
 }

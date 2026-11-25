@@ -301,7 +301,8 @@
       "failed": "Could not save. Please try again.",
       "tooLarge": "The photo is larger than 100 MB.",
       "decode": "This file could not be opened as a photo.",
-      "quota": "Not enough storage left for this photo."
+      "quota": "Not enough storage left for this photo.",
+      "badLink": "This does not look like a web page address."
     },
     "trashLink": "Trash ({count})",
     "trashTitle": "Board trash",
@@ -315,6 +316,21 @@
     "paletteFromImage": "Palette from photo",
     "openImage": "Open photo: {title}",
     "imageUnavailable": "The photo cannot be shown: storage is not configured.",
-    "paletteTitle": "Palette · {title}"
+    "paletteTitle": "Palette · {title}",
+    "linkUrl": "Link address",
+    "linkEmpty": "Add the address of a page.",
+    "linkSaving": "Reading the page…",
+    "openLink": "Open the link: {site}",
+    "placeName": "Place name",
+    "placeAddress": "Address",
+    "placeOpenMap": "On the map",
+    "placeLinked": "Linked to a Google place",
+    "placeUnlink": "Unlink",
+    "placeLightNoDate": "The light will show once the shoot has a date.",
+    "placeLightTitle": "Light · {date}",
+    "placeMorningGolden": "Morning golden hour",
+    "placeEveningGolden": "Evening golden hour",
+    "placeSunrise": "Sunrise",
+    "placeSunset": "Sunset"
   }
 }

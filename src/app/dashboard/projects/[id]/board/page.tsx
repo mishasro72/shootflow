@@ -1,18 +1,26 @@
 import { ArrowLeft, Trash2 } from "lucide-react";
 import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { placeMeta } from "@/lib/board/schemas";
 import type { BoardItem } from "@/lib/board/tree";
+import { getEnv } from "@/lib/env";
 import { uploadsEnabled } from "@/lib/storage/availability";
 import { signDownload } from "@/lib/storage/r2";
+import { placeLight } from "@/lib/sun/place-light";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { utcToZonedLocal } from "@/lib/time/zoned";
 
 import { getProject } from "../../queries";
 import { ProjectTabs } from "../project-tabs";
 
 import { BoardFeed } from "./board-feed";
+import { freshPlaceCoords } from "./place-coords";
+
+/** Saving a link reads the page and its picture: give the server action time for that. */
+export const maxDuration = 30;
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -25,13 +33,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 /**
  * The project board for the photographer: every live card, read through RLS. Photo cards
  * get signed links to their two copies here, on every view; the database keeps only keys.
+ * Place cards get the light of the shoot day at that place, from coordinates we may still
+ * use (refreshed by place ID when older than 30 days).
  */
 export default async function BoardPage({ params }: Props) {
   const { id } = await params;
   const project = await getProject(id);
   if (!project) notFound();
 
-  const [t, tProject] = await Promise.all([getTranslations("Board"), getTranslations("Project")]);
+  const [t, tProject, locale] = await Promise.all([getTranslations("Board"), getTranslations("Project"), getLocale()]);
   const supabase = await createSupabaseServerClient();
   const [{ data: items }, { count: trashed }] = await Promise.all([
     supabase
@@ -49,12 +59,26 @@ export default async function BoardPage({ params }: Props) {
   ]);
 
   const uploads = uploadsEnabled();
+  const shootDate = project.shoot_start ? utcToZonedLocal(project.shoot_start, project.timezone).date : null;
+
   const cards: BoardItem[] = await Promise.all(
-    (items ?? []).map(async ({ image_key, thumb_key, ...item }) => ({
-      ...(item as Omit<BoardItem, "thumb_url" | "image_url">),
-      image_url: uploads && image_key ? await signDownload(image_key) : null,
-      thumb_url: uploads && thumb_key ? await signDownload(thumb_key) : null,
-    })),
+    (items ?? []).map(async ({ image_key, thumb_key, ...item }) => {
+      const card: BoardItem = {
+        ...(item as Omit<BoardItem, "thumb_url" | "image_url">),
+        image_url: uploads && image_key ? await signDownload(image_key) : null,
+        thumb_url: uploads && thumb_key ? await signDownload(thumb_key) : null,
+      };
+      if (item.kind !== "LOCATION") return card;
+
+      const coords = await freshPlaceCoords(supabase, item);
+      if (!coords) return { ...card, place_light: null };
+      if (!shootDate) return { ...card, place_light: "noDate" };
+      const zone = placeMeta(item.payload).timeZone ?? project.timezone;
+      return {
+        ...card,
+        place_light: placeLight(shootDate, coords.lat, coords.lng, zone, locale, tProject("lightNone")),
+      };
+    }),
   );
 
   return (
@@ -74,7 +98,12 @@ export default async function BoardPage({ params }: Props) {
 
       <p className="text-sm text-muted-foreground">{t("lead")}</p>
 
-      <BoardFeed projectId={project.id} items={cards} uploads={uploads} />
+      <BoardFeed
+        projectId={project.id}
+        items={cards}
+        uploads={uploads}
+        maps={Boolean(getEnv().GOOGLE_MAPS_API_KEY)}
+      />
 
       <Link
         href={`/dashboard/projects/${project.id}/board/trash`}

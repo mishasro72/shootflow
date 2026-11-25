@@ -4,6 +4,8 @@
  * into the feed and compute new orders. No React or database here, so they are easy to test.
  */
 
+import type { PlaceLight } from "@/lib/sun/place-light";
+
 export type BoardKind = "GROUP" | "IMAGE" | "PALETTE" | "NOTE" | "LINK" | "LOCATION";
 export type GroupRole = "LOOK" | "SECTION";
 export type Visibility = "EVERYONE" | "TEAM" | "PRIVATE";
@@ -27,6 +29,8 @@ export type BoardItem = {
   /** Photo cards: signed links to the 400 px thumbnail and the 2048 px copy (they expire). */
   thumb_url?: string | null;
   image_url?: string | null;
+  /** Place cards: light on the shoot day there; "noDate" when the shoot has no date yet. */
+  place_light?: PlaceLight | "noDate" | null;
 };
 
 export type FeedNode = BoardItem & { children: FeedNode[] };

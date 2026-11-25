@@ -27,3 +27,11 @@ export function googleMapsUrl(name: string | null, placeId: string): string {
   url.searchParams.set("query_place_id", placeId);
   return url.toString();
 }
+
+/** A Google Maps search for a place typed by hand (no place ID): its address or name. */
+export function addressMapUrl(text: string): string {
+  const url = new URL("https://www.google.com/maps/search/");
+  url.searchParams.set("api", "1");
+  url.searchParams.set("query", text.trim());
+  return url.toString();
+}

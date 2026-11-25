@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { createContext, useContext, useMemo, useState, useTransition } from "react";
 
-import type { NewCardKind, UpdateCardInput } from "@/lib/board/schemas";
+import type { LinkCardInput, LocationCardInput, NewCardKind, UpdateCardInput } from "@/lib/board/schemas";
 import { buildFeed, moveBy, siblingIds, type BoardItem, type FeedNode } from "@/lib/board/tree";
 import { BoardImageUploadError, uploadBoardImage, type BoardImageError } from "@/lib/board/upload-image";
 
@@ -14,6 +14,8 @@ import {
   createPaletteFromImage,
   moveBoardCard,
   reorderBoardCards,
+  saveLinkCard,
+  saveLocationCard,
   setBoardCardInShotList,
   setBoardCardVisibility,
   trashBoardCard,
@@ -24,7 +26,7 @@ import { AddMenu } from "./add-menu";
 import { BoardCard } from "./board-card";
 import { SortableItem, SortableList } from "./sortable-list";
 
-type BoardError = "invalid" | "failed" | BoardImageError;
+type BoardError = "invalid" | "failed" | "badLink" | BoardImageError;
 
 /** Everything a card needs to change the board, shared through context. */
 type BoardApi = {
@@ -32,12 +34,16 @@ type BoardApi = {
   pending: boolean;
   /** Photo uploads work (R2 is configured). */
   uploads: boolean;
+  /** Google place search works (the server has a key). */
+  maps: boolean;
   editingId: string | null;
   setEditingId: (id: string | null) => void;
   add: (kind: NewCardKind, parentId: string | null) => void;
   addImages: (files: File[], parentId: string | null) => void;
   paletteFromImage: (item: BoardItem) => void;
   save: (input: UpdateCardInput) => Promise<boolean>;
+  saveLink: (input: LinkCardInput) => Promise<boolean>;
+  saveLocation: (input: LocationCardInput) => Promise<boolean>;
   reorder: (parentId: string | null, ids: string[]) => void;
   step: (item: BoardItem, by: number) => void;
   move: (item: BoardItem, parentId: string | null) => void;
@@ -59,7 +65,17 @@ export function useBoard(): BoardApi {
  * this component keeps a local copy so drags and arrows move cards at once, then saves.
  * After every save the server sends the board again and the copy is replaced.
  */
-export function BoardFeed({ projectId, items, uploads }: { projectId: string; items: BoardItem[]; uploads: boolean }) {
+export function BoardFeed({
+  projectId,
+  items,
+  uploads,
+  maps,
+}: {
+  projectId: string;
+  items: BoardItem[];
+  uploads: boolean;
+  maps: boolean;
+}) {
   const t = useTranslations("Board");
   const router = useRouter();
   const [local, setLocal] = useState(items);
@@ -127,10 +143,19 @@ export function BoardFeed({ projectId, items, uploads }: { projectId: string; it
     });
   }
 
+  /** Saves from an open editor: the error is shown, and the editor stays open on failure. */
+  async function saveWith(action: () => Promise<BoardActionResult>): Promise<boolean> {
+    setError(null);
+    const result = await action();
+    if (!result.ok) setError(result.error);
+    return result.ok;
+  }
+
   const api: BoardApi = {
     feed,
     pending,
     uploads,
+    maps,
     editingId,
     setEditingId,
     add: (kind, parentId) =>
@@ -140,12 +165,9 @@ export function BoardFeed({ projectId, items, uploads }: { projectId: string; it
       ),
     addImages,
     paletteFromImage: (item) => run(() => createPaletteFromImage(item.id)),
-    save: async (input) => {
-      setError(null);
-      const result = await updateBoardCard(input);
-      if (!result.ok) setError(result.error);
-      return result.ok;
-    },
+    save: (input) => saveWith(() => updateBoardCard(input)),
+    saveLink: (input) => saveWith(() => saveLinkCard(input)),
+    saveLocation: (input) => saveWith(() => saveLocationCard(input)),
     reorder: (parentId, ids) => {
       applyOrder(ids);
       run(() => reorderBoardCards({ projectId, parentId, ids }));

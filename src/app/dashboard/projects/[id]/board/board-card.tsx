@@ -1,15 +1,18 @@
 "use client";
 
-import { Camera, CameraOff, ImageOff, Lock, Users } from "lucide-react";
+import { Camera, CameraOff, ExternalLink, ImageOff, Lock, MapPin, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState, type FormEvent, type ReactNode } from "react";
 
+import { PlaceSearch } from "@/components/places/place-search";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { imageMeta, MAX_PALETTE_COLORS, paletteColors } from "@/lib/board/schemas";
+import { imageMeta, linkMeta, MAX_PALETTE_COLORS, paletteColors, placeMeta } from "@/lib/board/schemas";
 import type { BoardItem, BoardKind, GroupRole } from "@/lib/board/tree";
+import { addressMapUrl, googleMapsUrl } from "@/lib/places/policy";
+import type { PickedPlace } from "@/lib/places/types";
 import { cn } from "@/lib/utils";
 
 import { useBoard } from "./board-feed";
@@ -97,8 +100,10 @@ function CardContent({ item, title }: { item: BoardItem; title: string }) {
   return (
     <div className="mt-1 flex flex-col gap-2 px-1">
       {item.kind === "IMAGE" && <Photo item={item} title={title} />}
+      {item.kind === "LINK" && <LinkPreview item={item} />}
       <h3 className={cn("font-medium break-words", item.kind === "GROUP" && "text-base")}>{title}</h3>
       {item.body && <p className="whitespace-pre-wrap break-words text-muted-foreground">{item.body}</p>}
+      {item.kind === "LOCATION" && <PlaceInfo item={item} />}
       {colors.length > 0 && (
         <ul className="flex flex-wrap gap-2" data-testid="palette">
           {colors.map((color, index) => (
@@ -155,48 +160,182 @@ function Photo({ item, title }: { item: BoardItem; title: string }) {
   );
 }
 
-/** Title and text for every card; colours for palettes; an edge colour for groups. */
+/**
+ * A link card: the page's picture (copied into our storage) and the site name, the whole
+ * block opening the page in a new tab. Until an address is saved, a hint.
+ */
+function LinkPreview({ item }: { item: BoardItem }) {
+  const t = useTranslations("Board");
+  const meta = linkMeta(item.payload);
+  if (!meta) return <p className="text-muted-foreground">{t("linkEmpty")}</p>;
+  return (
+    <a
+      href={meta.url}
+      target="_blank"
+      // nofollow: the board is not a list of recommendations; noreferrer hides our address.
+      rel="noopener noreferrer nofollow"
+      aria-label={t("openLink", { site: meta.site })}
+      className="block overflow-hidden rounded-lg border hover:bg-accent/40"
+      data-testid="link-preview"
+    >
+      {item.thumb_url && (
+        // A signed, expiring URL: next/image would cache it longer than it lives.
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={item.thumb_url} alt="" loading="lazy" className="aspect-[1.91/1] w-full bg-muted object-cover" />
+      )}
+      <span className="flex flex-col gap-0.5 px-3 py-2">
+        <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <ExternalLink className="size-3.5 shrink-0" aria-hidden />
+          <span className="truncate">{meta.site}</span>
+        </span>
+        {meta.description && <span className="line-clamp-2 text-xs text-muted-foreground">{meta.description}</span>}
+      </span>
+    </a>
+  );
+}
+
+/**
+ * A place card: a link to the map (by Google place ID, or a search for the address typed
+ * by hand) and the light of the shoot day at that place, worked out on the server.
+ */
+function PlaceInfo({ item }: { item: BoardItem }) {
+  const t = useTranslations("Board");
+  const { placeId } = placeMeta(item.payload);
+  const typed = item.body || item.title;
+  const mapUrl = placeId ? googleMapsUrl(item.title, placeId) : typed ? addressMapUrl(typed) : null;
+  const light = item.place_light;
+
+  return (
+    <div className="flex flex-col gap-2">
+      {mapUrl && (
+        <a
+          href={mapUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex w-fit items-center gap-1.5 underline-offset-4 hover:underline"
+        >
+          <MapPin className="size-4 shrink-0" aria-hidden />
+          {t("placeOpenMap")}
+        </a>
+      )}
+      {light === "noDate" && <p className="text-xs text-muted-foreground">{t("placeLightNoDate")}</p>}
+      {light && light !== "noDate" && (
+        <div className="rounded-md bg-muted px-3 py-2 text-xs" data-testid="place-light">
+          <p className="mb-1 font-medium">{t("placeLightTitle", { date: light.date })}</p>
+          <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5">
+            <dt className="text-muted-foreground">{t("placeMorningGolden")}</dt>
+            <dd>{light.morningGolden}</dd>
+            <dt className="text-muted-foreground">{t("placeEveningGolden")}</dt>
+            <dd>{light.eveningGolden}</dd>
+            <dt className="text-muted-foreground">{t("placeSunrise")}</dt>
+            <dd>{light.sunrise}</dd>
+            <dt className="text-muted-foreground">{t("placeSunset")}</dt>
+            <dd>{light.sunset}</dd>
+          </dl>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Title and text for every card; colours for palettes; an edge colour for groups; the
+ * address for a link; Google place search for a place (name and address stay editable).
+ */
 function CardEditor({ item }: { item: BoardItem }) {
   const t = useTranslations("Board");
-  const { save, setEditingId } = useBoard();
+  const { save, saveLink, saveLocation, setEditingId, maps } = useBoard();
   const [title, setTitle] = useState(item.title);
   const [body, setBody] = useState(item.body ?? "");
   const [colors, setColors] = useState(() => paletteColors(item.payload));
   const [groupColor, setGroupColor] = useState(item.group_color);
+  const [url, setUrl] = useState(() => linkMeta(item.payload)?.url ?? "");
+  // undefined: keep the card's place; null: unlink it; a value: newly picked.
+  const [place, setPlace] = useState<PickedPlace | null | undefined>(undefined);
   const [saving, setSaving] = useState(false);
+
+  const isLink = item.kind === "LINK";
+  const isPlace = item.kind === "LOCATION";
+  const linked = place === undefined ? placeMeta(item.payload).placeId !== null : place !== null;
+
+  function pick(picked: PickedPlace, fallbackName: string) {
+    setPlace(picked);
+    setTitle(picked.name || fallbackName);
+    setBody(picked.address);
+  }
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
     setSaving(true);
-    const ok = await save({
-      id: item.id,
-      title,
-      body: body || null,
-      ...(item.kind === "PALETTE" ? { colors } : {}),
-      ...(item.kind === "GROUP" ? { groupColor } : {}),
-    });
+    let ok: boolean;
+    if (isLink) ok = await saveLink({ id: item.id, url, title, body: body || null });
+    else if (isPlace) ok = await saveLocation({ id: item.id, name: title, address: body || null, place });
+    else {
+      ok = await save({
+        id: item.id,
+        title,
+        body: body || null,
+        ...(item.kind === "PALETTE" ? { colors } : {}),
+        ...(item.kind === "GROUP" ? { groupColor } : {}),
+      });
+    }
     setSaving(false);
     if (ok) setEditingId(null);
   }
 
   return (
     <form onSubmit={onSubmit} className="mt-2 flex flex-col gap-3 px-1" data-testid="card-editor">
+      {isLink && (
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor={`url-${item.id}`}>{t("linkUrl")}</Label>
+          <Input
+            id={`url-${item.id}`}
+            // Text, not type="url": "pinterest.com/pin/1" without https:// is fine, the server adds it.
+            type="text"
+            inputMode="url"
+            autoComplete="url"
+            value={url}
+            maxLength={2048}
+            placeholder="https://"
+            required
+            onChange={(e) => setUrl(e.target.value)}
+            autoFocus
+          />
+        </div>
+      )}
+      {isPlace && maps && <PlaceSearch onPick={pick} />}
+      {isPlace && linked && (
+        <p
+          className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-md bg-muted px-3 py-2"
+          data-testid="place-linked"
+        >
+          <MapPin className="size-4 shrink-0 text-muted-foreground" aria-hidden />
+          <span className="min-w-0 flex-1">{t("placeLinked")}</span>
+          <button
+            type="button"
+            onClick={() => setPlace(null)}
+            className="text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+          >
+            {t("placeUnlink")}
+          </button>
+        </p>
+      )}
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor={`title-${item.id}`}>{t("titleLabel")}</Label>
+        <Label htmlFor={`title-${item.id}`}>{isPlace ? t("placeName") : t("titleLabel")}</Label>
         <Input
           id={`title-${item.id}`}
           value={title}
           maxLength={200}
           onChange={(e) => setTitle(e.target.value)}
-          autoFocus
+          autoFocus={!isLink && !isPlace}
         />
       </div>
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor={`body-${item.id}`}>{t("bodyLabel")}</Label>
+        <Label htmlFor={`body-${item.id}`}>{isPlace ? t("placeAddress") : t("bodyLabel")}</Label>
         <Textarea
           id={`body-${item.id}`}
           value={body}
-          maxLength={4000}
+          maxLength={isPlace ? 300 : 4000}
           rows={3}
           onChange={(e) => setBody(e.target.value)}
         />
@@ -269,7 +408,7 @@ function CardEditor({ item }: { item: BoardItem }) {
 
       <div className="flex flex-wrap gap-2">
         <Button type="submit" size="sm" disabled={saving}>
-          {t("save")}
+          {saving && isLink ? t("linkSaving") : t("save")}
         </Button>
         <Button type="button" variant="ghost" size="sm" onClick={() => setEditingId(null)}>
           {t("cancel")}

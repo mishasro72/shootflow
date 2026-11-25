@@ -82,6 +82,17 @@ export async function signDownload(key: string, downloadName?: string): Promise<
   return signed.url;
 }
 
+/** Uploads bytes the server itself has (a link's preview picture), without a signed URL. */
+export async function putObject(key: string, body: Uint8Array, contentType: string): Promise<void> {
+  const { client, bucketUrl } = storage();
+  const response = await client.fetch(objectUrl(bucketUrl, key).toString(), {
+    method: "PUT",
+    headers: { "Content-Type": contentType, "Content-Length": String(body.byteLength) },
+    body,
+  });
+  if (!response.ok) throw new Error(`R2 PUT failed with ${response.status}`);
+}
+
 /** The stored size of an object in bytes, or null if there is no such object. */
 export async function objectSize(key: string): Promise<number | null> {
   const { client, bucketUrl } = storage();

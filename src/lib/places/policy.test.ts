@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { googleMapsUrl, isCoordsFresh } from "./policy";
+import { addressMapUrl, googleMapsUrl, isCoordsFresh } from "./policy";
 
 describe("isCoordsFresh", () => {
   const now = new Date("2026-11-30T12:00:00Z");
@@ -27,5 +27,14 @@ describe("googleMapsUrl", () => {
 
   it("falls back to the place ID when there is no name", () => {
     expect(new URL(googleMapsUrl("  ", "ChIJabc")).searchParams.get("query")).toBe("ChIJabc");
+  });
+});
+
+describe("addressMapUrl", () => {
+  it("searches Google Maps for a place typed by hand", () => {
+    const url = new URL(addressMapUrl(" 2105 Umstead Dr, Raleigh "));
+    expect(url.searchParams.get("api")).toBe("1");
+    expect(url.searchParams.get("query")).toBe("2105 Umstead Dr, Raleigh");
+    expect(url.searchParams.has("query_place_id")).toBe(false);
   });
 });

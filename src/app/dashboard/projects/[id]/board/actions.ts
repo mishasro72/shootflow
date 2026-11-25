@@ -9,23 +9,34 @@ import {
   DEFAULT_PALETTE,
   imageCardSchema,
   imageMeta,
+  linkCardSchema,
+  linkMeta,
+  locationCardSchema,
   reorderSchema,
   updateCardSchema,
   visibilitySchema,
   type ImageCardInput,
+  type LinkCardInput,
+  type LocationCardInput,
   type UpdateCardInput,
 } from "@/lib/board/schemas";
+import { storeBoardImage } from "@/lib/board/store-image";
+import { fetchLinkPreview, fetchPreviewImage } from "@/lib/links/fetch-preview";
+import { normalizeLinkUrl, siteOf } from "@/lib/links/preview";
+import { uploadsEnabled } from "@/lib/storage/availability";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { isValidTimeZone } from "@/lib/time/zoned";
 
 /**
  * Board actions for the photographer. Every write goes through RLS (only the studio's own
  * projects), and the database checks the structure again in its triggers.
  */
 
-export type BoardActionResult = { ok: true; id?: string } | { ok: false; error: "invalid" | "failed" };
+export type BoardActionResult = { ok: true; id?: string } | { ok: false; error: "invalid" | "failed" | "badLink" };
 
 const INVALID = { ok: false, error: "invalid" } as const;
 const FAILED = { ok: false, error: "failed" } as const;
+const BAD_LINK = { ok: false, error: "badLink" } as const;
 
 const idSchema = z.uuid();
 
@@ -231,6 +242,113 @@ export async function updateBoardCard(input: UpdateCardInput): Promise<BoardActi
   } = { title, body: body || null };
   if (card.kind === "PALETTE" && colors) patch.payload = { ...(card.payload as object), colors };
   if (card.kind === "GROUP" && groupColor !== undefined) patch.group_color = groupColor;
+
+  const { error } = await supabase.from("board_items").update(patch).eq("id", card.id);
+  if (error) return FAILED;
+
+  refresh(card.project_id);
+  return { ok: true };
+}
+
+const EXTENSIONS = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/gif": "gif" } as const;
+
+/**
+ * Saves a link card. When the address is new, the server reads the page (safely: see
+ * safe-fetch.ts) for its title, description and picture, and copies the picture into R2,
+ * so the card keeps it even if the site changes or disappears. A page that cannot be read
+ * (a login wall, a private address) still gives a card: the address and the site name.
+ * A title the photographer typed wins over the page's.
+ */
+export async function saveLinkCard(input: LinkCardInput): Promise<BoardActionResult> {
+  const parsed = linkCardSchema.safeParse(input);
+  if (!parsed.success) return INVALID;
+  const url = normalizeLinkUrl(parsed.data.url);
+  if (!url) return BAD_LINK;
+  const { id, title, body } = parsed.data;
+
+  const supabase = await createSupabaseServerClient();
+  const { data: card } = await supabase
+    .from("board_items")
+    .select("id, project_id, workspace_id, payload")
+    .eq("id", id)
+    .eq("kind", "LINK")
+    .maybeSingle();
+  if (!card) return INVALID;
+
+  if (linkMeta(card.payload)?.url === url) {
+    const { error } = await supabase
+      .from("board_items")
+      .update({ title: title || siteOf(url), body: body || null })
+      .eq("id", card.id);
+    if (error) return FAILED;
+    refresh(card.project_id);
+    return { ok: true };
+  }
+
+  const found = await fetchLinkPreview(url);
+  const preview = found?.preview ?? null;
+  let imageKey: string | null = null;
+  if (preview?.image && uploadsEnabled()) {
+    const image = await fetchPreviewImage(preview.image);
+    if (image) {
+      const project = { id: card.project_id, workspace_id: card.workspace_id };
+      const fileName = `${siteOf(url)}-preview.${EXTENSIONS[image.type]}`;
+      imageKey = await storeBoardImage(supabase, project, image.bytes, image.type, fileName);
+    }
+  }
+
+  // A new address replaces the old picture; the old file is cleaned up at night.
+  const { error } = await supabase
+    .from("board_items")
+    .update({
+      title: (title || preview?.title || siteOf(url)).slice(0, 200),
+      body: body || null,
+      payload: { url, site: preview?.site || siteOf(url), description: preview?.description ?? null },
+      image_key: imageKey,
+      thumb_key: imageKey,
+    })
+    .eq("id", card.id);
+  if (error) return FAILED;
+
+  refresh(card.project_id);
+  return { ok: true };
+}
+
+/**
+ * Saves a place card: a name and an address, and the Google place if one was picked. A
+ * newly picked place brings coordinates with a new sync time (Google allows keeping them
+ * 30 days; see purge_stale_board_place_coords); `place: null` unlinks it, and leaving
+ * `place` out keeps what the card has.
+ */
+export async function saveLocationCard(input: LocationCardInput): Promise<BoardActionResult> {
+  const parsed = locationCardSchema.safeParse(input);
+  if (!parsed.success) return INVALID;
+  const { id, name, address, place } = parsed.data;
+  if (place?.timeZone && !isValidTimeZone(place.timeZone)) return INVALID;
+
+  const supabase = await createSupabaseServerClient();
+  const { data: card } = await supabase
+    .from("board_items")
+    .select("id, project_id")
+    .eq("id", id)
+    .eq("kind", "LOCATION")
+    .maybeSingle();
+  if (!card) return INVALID;
+
+  const patch: { title: string; body: string | null; payload?: Record<string, string | number | null> } = {
+    title: name,
+    body: address || null,
+  };
+  if (place === null) patch.payload = {};
+  if (place) {
+    patch.payload = {
+      place_id: place.placeId,
+      lat: place.lat,
+      lng: place.lng,
+      synced_at: new Date().toISOString(),
+      timezone: place.timeZone,
+    };
+  }
 
   const { error } = await supabase.from("board_items").update(patch).eq("id", card.id);
   if (error) return FAILED;

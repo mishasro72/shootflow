@@ -1,6 +1,6 @@
 "use client";
 
-import { ImageIcon, Layers, Palette, Plus, Shirt, StickyNote } from "lucide-react";
+import { ImageIcon, Layers, Link2, MapPin, Palette, Plus, Shirt, StickyNote } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRef } from "react";
 
@@ -15,7 +15,14 @@ import type { NewCardKind } from "@/lib/board/schemas";
 
 import { useBoard } from "./board-feed";
 
-const ICONS = { LOOK: Shirt, SECTION: Layers, NOTE: StickyNote, PALETTE: Palette } as const;
+const ICONS = {
+  LOOK: Shirt,
+  SECTION: Layers,
+  NOTE: StickyNote,
+  PALETTE: Palette,
+  LINK: Link2,
+  LOCATION: MapPin,
+} as const;
 
 /**
  * "Add" at the end of the feed (every kind) and inside a group (cards; a top-level
@@ -36,8 +43,8 @@ export function AddMenu({
   const { add, addImages, pending, uploads } = useBoard();
   const fileInput = useRef<HTMLInputElement>(null);
   const kinds: NewCardKind[] = parentId
-    ? [...(allowLook ? (["LOOK"] as const) : []), "NOTE", "PALETTE"]
-    : ["LOOK", "SECTION", "NOTE", "PALETTE"];
+    ? [...(allowLook ? (["LOOK"] as const) : []), "NOTE", "PALETTE", "LINK", "LOCATION"]
+    : ["LOOK", "SECTION", "NOTE", "PALETTE", "LINK", "LOCATION"];
 
   return (
     <>
