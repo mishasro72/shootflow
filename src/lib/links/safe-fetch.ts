@@ -20,7 +20,8 @@ export { UnsafeUrlError };
  *   connecting (a custom `lookup`), so a name cannot resolve to a public address for the
  *   check and to a private one for the request (DNS rebinding);
  * - redirects are followed by hand, at most 3, each new address checked the same way;
- * - a time limit for the whole request and a size limit for the answer.
+ * - a time limit for the whole request and a size limit for the answer (or, for a page,
+ *   only its first `maxBytes`: the tags we need are at the top).
  */
 
 export class FetchFailedError extends Error {}
@@ -31,6 +32,11 @@ export type SafeFetchOptions = {
   /** Whether a Content-Type is what we asked for ("text/html; charset=utf-8"). */
   acceptType: (contentType: string) => boolean;
   maxBytes: number;
+  /**
+   * What to do with a longer answer: false (a picture) refuses it; true (a page) keeps its
+   * first `maxBytes` and stops reading. A pin on Pinterest is a page of several megabytes.
+   */
+  truncate?: boolean;
   timeoutMs: number;
 };
 
@@ -78,7 +84,7 @@ function requestOnce(url: URL, options: SafeFetchOptions, signal: AbortSignal): 
           return;
         }
         const declared = Number(response.headers["content-length"] ?? 0);
-        if (declared > options.maxBytes) {
+        if (declared > options.maxBytes && !options.truncate) {
           response.destroy();
           reject(new FetchFailedError("too large"));
           return;
@@ -86,12 +92,18 @@ function requestOnce(url: URL, options: SafeFetchOptions, signal: AbortSignal): 
         const chunks: Buffer[] = [];
         let size = 0;
         response.on("data", (chunk: Buffer) => {
-          size += chunk.length;
-          if (size > options.maxBytes) {
+          if (size + chunk.length > options.maxBytes) {
             response.destroy();
-            reject(new FetchFailedError("too large"));
+            if (!options.truncate) {
+              reject(new FetchFailedError("too large"));
+              return;
+            }
+            // Enough of the page: keep what fits and stop downloading the rest.
+            chunks.push(chunk.subarray(0, options.maxBytes - size));
+            resolve({ status, contentType, body: Buffer.concat(chunks) });
             return;
           }
+          size += chunk.length;
           chunks.push(chunk);
         });
         response.on("end", () => resolve({ status, contentType, body: Buffer.concat(chunks) }));

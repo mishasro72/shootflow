@@ -9,7 +9,7 @@ import {
 } from "./preview";
 import { safeFetch } from "./safe-fetch";
 
-/** Pages are read up to 1 MB: the tags we need are in <head>, near the top. */
+/** Only the first 1 MB of a page is read: the tags we need are in <head>, near the top. */
 const MAX_PAGE_BYTES = 1024 * 1024;
 
 /** The charset from "text/html; charset=windows-1251", if the runtime knows it. */
@@ -33,6 +33,7 @@ export async function fetchLinkPreview(url: string): Promise<{ url: string; prev
       accept: "text/html,application/xhtml+xml;q=0.9,*/*;q=0.1",
       acceptType: (type) => type.startsWith("text/html") || type.startsWith("application/xhtml+xml"),
       maxBytes: MAX_PAGE_BYTES,
+      truncate: true,
       timeoutMs: 6000,
     });
     const html = decoderFor(page.contentType).decode(page.body);
