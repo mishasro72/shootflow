@@ -77,10 +77,8 @@ test("a link card keeps its address; private addresses are never fetched", async
   await page.getByTestId("card-editor").getByLabel(b.titleLabel).fill("Moodboard on Pinterest");
   await page.getByTestId("card-editor").getByRole("button", { name: b.save }).click();
   await page.reload();
-  await expect(page.getByRole("article", { name: "Moodboard on Pinterest" }).getByTestId("link-preview")).toHaveAttribute(
-    "href",
-    "http://127.0.0.1:3000/dashboard",
-  );
+  const renamed = page.getByRole("article", { name: "Moodboard on Pinterest" });
+  await expect(renamed.getByTestId("link-preview")).toHaveAttribute("href", "http://127.0.0.1:3000/dashboard");
 });
 
 test("a place card from Google search shows the map and the light of the shoot day", async ({ page }) => {

@@ -9,7 +9,7 @@ import { BoardImageUploadError, uploadBoardImage, type BoardImageError } from "@
 
 import { createImageCard } from "./board/actions";
 
-type State = "idle" | "working" | "done" | "invalid" | BoardImageError;
+type State = "idle" | "working" | "done" | "invalid" | "badLink" | BoardImageError;
 
 /**
  * "To board" next to an image in the Files folder. The file stays in Files; the board

@@ -43,7 +43,9 @@ export async function fetchLinkPreview(url: string): Promise<{ url: string; prev
 }
 
 /** The preview picture's bytes and real type, or null (too big, not a picture, unreachable). */
-export async function fetchPreviewImage(url: string): Promise<{ bytes: Uint8Array; type: PreviewImageType } | null> {
+export async function fetchPreviewImage(
+  url: string,
+): Promise<{ bytes: Uint8Array<ArrayBuffer>; type: PreviewImageType } | null> {
   try {
     const image = await safeFetch(url, {
       accept: "image/avif,image/webp,image/png,image/jpeg,image/gif;q=0.9",

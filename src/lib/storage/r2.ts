@@ -83,7 +83,7 @@ export async function signDownload(key: string, downloadName?: string): Promise<
 }
 
 /** Uploads bytes the server itself has (a link's preview picture), without a signed URL. */
-export async function putObject(key: string, body: Uint8Array, contentType: string): Promise<void> {
+export async function putObject(key: string, body: Uint8Array<ArrayBuffer>, contentType: string): Promise<void> {
   const { client, bucketUrl } = storage();
   const response = await client.fetch(objectUrl(bucketUrl, key).toString(), {
     method: "PUT",

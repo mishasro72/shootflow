@@ -16,7 +16,7 @@ type Supabase = Awaited<ReturnType<typeof createSupabaseServerClient>>;
 export async function storeBoardImage(
   supabase: Supabase,
   project: { id: string; workspace_id: string },
-  bytes: Uint8Array,
+  bytes: Uint8Array<ArrayBuffer>,
   contentType: string,
   fileName: string,
 ): Promise<string | null> {
