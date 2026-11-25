@@ -76,6 +76,8 @@ test("a link card keeps its address; private addresses are never fetched", async
   await page.getByRole("menuitem", { name: b.edit }).click();
   await page.getByTestId("card-editor").getByLabel(b.titleLabel).fill("Moodboard on Pinterest");
   await page.getByTestId("card-editor").getByRole("button", { name: b.save }).click();
+  // Reload only once the save is done: the editor closes when the server has answered.
+  await expect(page.getByTestId("card-editor")).toHaveCount(0);
   await page.reload();
   const renamed = page.getByRole("article", { name: "Moodboard on Pinterest" });
   await expect(renamed.getByTestId("link-preview")).toHaveAttribute("href", "http://127.0.0.1:3000/dashboard");
