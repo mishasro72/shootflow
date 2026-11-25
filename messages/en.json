@@ -331,6 +331,34 @@
     "placeMorningGolden": "Morning golden hour",
     "placeEveningGolden": "Evening golden hour",
     "placeSunrise": "Sunrise",
-    "placeSunset": "Sunset"
+    "placeSunset": "Sunset",
+    "shadowTitle": "Shadows · {time}",
+    "shadowTime": "Time of day",
+    "shadowNorth": "N",
+    "shadowSun": "Sun {from}, {altitude}° above the horizon.",
+    "shadowCast": "Shadow of a person 5 ft 7 in tall: {direction}, about {length}.",
+    "shadowVeryLong": "very long",
+    "shadowNoSun": "The sun does not rise here on this day.",
+    "shadowNote": "Buildings, trees and terrain are not taken into account.",
+    "sunFrom": {
+      "N": "from the north",
+      "NE": "from the northeast",
+      "E": "from the east",
+      "SE": "from the southeast",
+      "S": "from the south",
+      "SW": "from the southwest",
+      "W": "from the west",
+      "NW": "from the northwest"
+    },
+    "shadowTo": {
+      "N": "to the north",
+      "NE": "to the northeast",
+      "E": "to the east",
+      "SE": "to the southeast",
+      "S": "to the south",
+      "SW": "to the southwest",
+      "W": "to the west",
+      "NW": "to the northwest"
+    }
   }
 }

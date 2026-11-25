@@ -76,7 +76,15 @@ export default async function BoardPage({ params }: Props) {
       const zone = placeMeta(item.payload).timeZone ?? project.timezone;
       return {
         ...card,
-        place_light: placeLight(shootDate, coords.lat, coords.lng, zone, locale, tProject("lightNone")),
+        place_light: placeLight(
+          shootDate,
+          coords.lat,
+          coords.lng,
+          zone,
+          locale,
+          tProject("lightNone"),
+          project.shoot_start,
+        ),
       };
     }),
   );

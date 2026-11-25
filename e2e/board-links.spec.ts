@@ -83,7 +83,7 @@ test("a link card keeps its address; private addresses are never fetched", async
   await expect(renamed.getByTestId("link-preview")).toHaveAttribute("href", "http://127.0.0.1:3000/dashboard");
 });
 
-test("a place card from Google search shows the map and the light of the shoot day", async ({ page }) => {
+test("a place card from Google search shows the map, the light and the shadows of the shoot day", async ({ page }) => {
   await mockPlaces(page);
   await signUpFresh(page);
   await openBoard(page, "Place board", "2026-11-14");
@@ -108,6 +108,18 @@ test("a place card from Google search shows the map and the light of the shoot d
   await expect(light).toContainText("Saturday, November 14, 2026");
   await expect(light).toContainText(b.placeMorningGolden);
   await expect(light).toContainText(/AM/);
+
+  // Shadows open on the shoot start (noon): the sun in the south, the shadow to the north.
+  const shadow = card.getByTestId("place-shadow");
+  await expect(shadow).toContainText("12:00 PM");
+  await expect(shadow).toContainText(b.sunFrom.S);
+  await expect(shadow).toContainText(b.shadowTo.N);
+  await expect(shadow).toContainText(/ft/);
+  // At 9 AM the sun is in the south-east and the shadow falls to the north-west.
+  await shadow.getByRole("slider", { name: b.shadowTime }).fill(String(9 * 60));
+  await expect(shadow).toContainText("9:00 AM");
+  await expect(shadow).toContainText(b.sunFrom.SE);
+  await expect(shadow).toContainText(b.shadowTo.NW);
   await expectNoHorizontalScroll(page);
 
   // A place typed by hand: a map search for its address, and no light (no coordinates).
@@ -119,6 +131,7 @@ test("a place card from Google search shows the map and the light of the shoot d
   const studio = page.getByRole("article", { name: "Studio X" });
   await expect(studio.getByRole("link", { name: b.placeOpenMap })).toHaveAttribute("href", /query=123\+Main\+St/);
   await expect(studio.getByTestId("place-light")).toHaveCount(0);
+  await expect(studio.getByTestId("place-shadow")).toHaveCount(0);
 
   // Everything survives a reload.
   await page.reload();

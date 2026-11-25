@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 
 import { useBoard } from "./board-feed";
 import { CardMenu } from "./card-menu";
+import { ShadowDial } from "./shadow-dial";
 
 /** Colours a group can be marked with (the left edge of the card). */
 const GROUP_COLORS = ["#e8dcc8", "#f2c46d", "#e07a5f", "#81b29a", "#7aa5d2", "#b392ac"];
@@ -196,7 +197,8 @@ function LinkPreview({ item }: { item: BoardItem }) {
 
 /**
  * A place card: a link to the map (by Google place ID, or a search for the address typed
- * by hand) and the light of the shoot day at that place, worked out on the server.
+ * by hand), the light of the shoot day at that place and the shadows through that day,
+ * worked out on the server.
  */
 function PlaceInfo({ item }: { item: BoardItem }) {
   const t = useTranslations("Board");
@@ -234,6 +236,7 @@ function PlaceInfo({ item }: { item: BoardItem }) {
           </dl>
         </div>
       )}
+      {light && light !== "noDate" && <ShadowDial sun={light.sun} openAt={light.openAt} />}
     </div>
   );
 }
