@@ -1,6 +1,6 @@
 "use client";
 
-import { Camera, CameraOff, Lock, Users } from "lucide-react";
+import { Camera, CameraOff, ImageOff, Lock, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState, type FormEvent, type ReactNode } from "react";
 
@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { MAX_PALETTE_COLORS, paletteColors } from "@/lib/board/schemas";
+import { imageMeta, MAX_PALETTE_COLORS, paletteColors } from "@/lib/board/schemas";
 import type { BoardItem, BoardKind, GroupRole } from "@/lib/board/tree";
 import { cn } from "@/lib/utils";
 
@@ -96,6 +96,7 @@ function CardContent({ item, title }: { item: BoardItem; title: string }) {
   const colors = item.kind === "PALETTE" ? paletteColors(item.payload) : [];
   return (
     <div className="mt-1 flex flex-col gap-2 px-1">
+      {item.kind === "IMAGE" && <Photo item={item} title={title} />}
       <h3 className={cn("font-medium break-words", item.kind === "GROUP" && "text-base")}>{title}</h3>
       {item.body && <p className="whitespace-pre-wrap break-words text-muted-foreground">{item.body}</p>}
       {colors.length > 0 && (
@@ -109,6 +110,48 @@ function CardContent({ item, title }: { item: BoardItem; title: string }) {
         </ul>
       )}
     </div>
+  );
+}
+
+/**
+ * A photo card's picture. The 400 px thumbnail loads first; on a wide or sharp screen the
+ * browser picks the 2048 px copy from `srcSet`. Width and height reserve the space, so the
+ * feed does not jump while pictures load. A tap opens the big copy in a new tab.
+ */
+function Photo({ item, title }: { item: BoardItem; title: string }) {
+  const t = useTranslations("Board");
+  const meta = imageMeta(item.payload);
+  if (!item.thumb_url) {
+    return (
+      <div className="flex aspect-[4/3] items-center justify-center rounded-lg bg-muted text-muted-foreground">
+        <ImageOff className="size-6" aria-hidden />
+        <span className="sr-only">{t("imageUnavailable")}</span>
+      </div>
+    );
+  }
+  return (
+    <a
+      href={item.image_url ?? item.thumb_url}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={t("openImage", { title })}
+      className="block overflow-hidden rounded-lg bg-muted"
+    >
+      {/* Signed links expire, so next/image would cache them longer than they live. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={item.thumb_url}
+        srcSet={item.image_url ? `${item.thumb_url} 400w, ${item.image_url} 2048w` : undefined}
+        sizes="(min-width: 768px) 720px, 100vw"
+        width={meta?.width}
+        height={meta?.height}
+        alt={title}
+        loading="lazy"
+        decoding="async"
+        data-testid="board-image"
+        className="h-auto max-h-[70vh] w-full object-contain"
+      />
+    </a>
   );
 }
 

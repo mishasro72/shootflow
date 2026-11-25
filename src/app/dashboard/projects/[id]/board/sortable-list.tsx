@@ -1,5 +1,7 @@
 "use client";
 
+import { useId, type ReactNode } from "react";
+
 import {
   closestCenter,
   DndContext,
@@ -18,8 +20,6 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical } from "lucide-react";
-import type { ReactNode } from "react";
-
 import { moveTo } from "@/lib/board/tree";
 import { cn } from "@/lib/utils";
 
@@ -36,6 +36,9 @@ type Props = {
 };
 
 export function SortableList({ ids, onReorder, children }: Props) {
+  // dnd-kit numbers its accessibility ids with a global counter, which differs between the
+  // server render and the browser. A stable id from React keeps both renders the same.
+  const dndId = useId();
   const sensors = useSensors(
     // A few pixels of movement before a drag starts, so a tap on the handle is just a tap.
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
@@ -49,6 +52,7 @@ export function SortableList({ ids, onReorder, children }: Props) {
 
   return (
     <DndContext
+      id={dndId}
       sensors={sensors}
       collisionDetection={closestCenter}
       modifiers={[restrictToVerticalAxis]}

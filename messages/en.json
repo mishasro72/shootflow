@@ -215,7 +215,6 @@
     "mapLink": "Map: {url}",
     "feedName": "ShootFlow · {studio}"
   },
-
   "Uploader": {
     "drop": "Drop photos or PDF files here, or click to choose",
     "hint": "Images and PDF, up to 100 MB each.",
@@ -243,7 +242,11 @@
     "deleteConfirm": "Delete this file for good?",
     "deleteYes": "Yes, delete",
     "deleteNo": "Cancel",
-    "disabled": "File uploads need Cloudflare R2 and the Supabase secret key on the server."
+    "disabled": "File uploads need Cloudflare R2 and the Supabase secret key on the server.",
+    "toBoard": "To board",
+    "toBoardFile": "Copy {name} to the board",
+    "toBoardWorking": "Copying…",
+    "onBoard": "On the board"
   },
   "Board": {
     "title": "Board",
@@ -295,7 +298,10 @@
     "cancel": "Cancel",
     "errors": {
       "invalid": "That is not possible: for example, a group cannot go inside a look.",
-      "failed": "Could not save. Please try again."
+      "failed": "Could not save. Please try again.",
+      "tooLarge": "The photo is larger than 100 MB.",
+      "decode": "This file could not be opened as a photo.",
+      "quota": "Not enough storage left for this photo."
     },
     "trashLink": "Trash ({count})",
     "trashTitle": "Board trash",
@@ -304,6 +310,11 @@
     "trashInside": "{count, plural, one {# card inside} other {# cards inside}}",
     "daysLeft": "{days, plural, =0 {removed today} one {# day left} other {# days left}}",
     "restore": "Restore",
-    "backToBoard": "Back to board"
+    "backToBoard": "Back to board",
+    "imagesUploading": "Uploading photos: {done} of {total}…",
+    "paletteFromImage": "Palette from photo",
+    "openImage": "Open photo: {title}",
+    "imageUnavailable": "The photo cannot be shown: storage is not configured.",
+    "paletteTitle": "Palette · {title}"
   }
 }
