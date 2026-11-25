@@ -17,7 +17,7 @@ describe("placeLight", () => {
 
   it("carries the sun over the day and opens the dial on the shoot start", () => {
     const nine = light.sun.find((step) => step.minute === 9 * 60);
-    expect(nine?.time).toBe("9:00 AM");
+    expect(nine?.time).toMatch(/^9:00\sAM$/);
     expect(nine?.bearing).toBeGreaterThan(130);
     expect(light.openAt).toBe(9 * 60);
     const noTime = placeLight("2026-11-14", 35.7796, -78.6382, "America/New_York", "en-US", "—");

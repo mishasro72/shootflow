@@ -36,11 +36,14 @@ export function ShadowDial({ sun, openAt }: { sun: SunStep[]; openAt: number | n
   const locale = useLocale();
   const [minute, setMinute] = useState(openAt ?? sun[0]?.minute ?? 0);
 
-  if (sun.length === 0) {
+  const first = sun[0];
+  if (!first) {
     return <p className="text-xs text-muted-foreground">{t("shadowNoSun")}</p>;
   }
 
-  const step = sun.find((s) => s.minute === minute) ?? sun[0];
+  const last = sun.at(-1) ?? first;
+  const stepMinutes = sun[1] ? sun[1].minute - first.minute : 15;
+  const step = sun.find((s) => s.minute === minute) ?? first;
   const length = shadowLength(step.altitude, PERSON_HEIGHT_M);
   const toward = shadowBearing(step.bearing);
   const sunText = t("shadowSun", {
@@ -55,8 +58,6 @@ export function ShadowDial({ sun, openAt }: { sun: SunStep[]; openAt: number | n
   // The drawn shadow: a person is 14 px tall on the dial; very long shadows stop at the rim.
   const tip = onDial(toward, Math.min(46, 14 * ((length ?? 100) / PERSON_HEIGHT_M)));
   const sunDot = onDial(step.bearing, 50);
-  const first = sun[0].minute;
-  const last = sun[sun.length - 1].minute;
 
   return (
     <div className="flex flex-col gap-2 rounded-md bg-muted px-3 py-2 text-xs" data-testid="place-shadow">
@@ -95,9 +96,9 @@ export function ShadowDial({ sun, openAt }: { sun: SunStep[]; openAt: number | n
         <span className="text-muted-foreground">{t("shadowTime")}</span>
         <input
           type="range"
-          min={first}
-          max={last}
-          step={sun.length > 1 ? sun[1].minute - first : 15}
+          min={first.minute}
+          max={last.minute}
+          step={stepMinutes}
           value={step.minute}
           aria-valuetext={step.time}
           onChange={(event) => setMinute(Number(event.target.value))}

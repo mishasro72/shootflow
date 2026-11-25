@@ -111,13 +111,13 @@ test("a place card from Google search shows the map, the light and the shadows o
 
   // Shadows open on the shoot start (noon): the sun in the south, the shadow to the north.
   const shadow = card.getByTestId("place-shadow");
-  await expect(shadow).toContainText("12:00 PM");
+  await expect(shadow).toContainText(/12:00\sPM/);
   await expect(shadow).toContainText(b.sunFrom.S);
   await expect(shadow).toContainText(b.shadowTo.N);
   await expect(shadow).toContainText(/ft/);
   // At 9 AM the sun is in the south-east and the shadow falls to the north-west.
   await shadow.getByRole("slider", { name: b.shadowTime }).fill(String(9 * 60));
-  await expect(shadow).toContainText("9:00 AM");
+  await expect(shadow).toContainText(/9:00\sAM/);
   await expect(shadow).toContainText(b.sunFrom.SE);
   await expect(shadow).toContainText(b.shadowTo.NW);
   await expectNoHorizontalScroll(page);

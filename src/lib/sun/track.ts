@@ -57,7 +57,7 @@ const POINTS: CompassPoint[] = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
 
 /** The nearest of the eight compass points: 0–22.4° is north, 22.5–67.4° north-east, … */
 export const compassPoint = (bearing: number): CompassPoint =>
-  POINTS[Math.round((((bearing % 360) + 360) % 360) / 45) % 8];
+  POINTS[Math.round((((bearing % 360) + 360) % 360) / 45) % 8] ?? "N";
 
 /** Length of the shadow of something `height` tall; null when the sun is below the horizon. */
 export function shadowLength(altitude: number, height: number): number | null {
